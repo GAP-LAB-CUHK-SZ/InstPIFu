@@ -1,10 +1,96 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Towards High-Fidelity Single-view Holistic Reconstruction of Indoor Scenes</title>
+    <link rel="stylesheet" href="w3.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <meta name="google-site-verification" content="vIrKe6Ecwa3TVjmMt0OaJpDGw_SJa5IxzTA86wU44QE" />
 </head>
+
 <body>
-$END$
+
+<br/>
+<br/>
+
+<div class="w3-container" id="paper">
+    <div class="w3-content" style="max-width:850px">
+
+    <h2 align="center" id="title"><b>Towards High-Fidelity Single-view Holistic Reconstruction of Indoor Scenes</b></h2>
+    <br/>
+    <!-- <p align="center" id="title">Conference Name (NAME), YYYY.</p> -->
+
+    <p align="center" class="center_text" id="authors">
+        <a target="_blank">Haolin Liu</a><sup>1,2*</sup>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <a target="_blank">Yujian Zheng</a><sup>1,2*</sup>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <a target="_blank">Guanying Chen</a><sup>1,2</sup>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <a target="_blank" href="https://mypage.cuhk.edu.cn/academics/hanxiaoguang/">Xiaoguang Han</a><sup>1,2,&#8224</sup>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <a target="_blank">Shuguang Cui</a><sup>1,2</sup>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+    </p>
+
+    <p class="center_text" align="center">
+        <sup>1</sup>School of Science and Engineering, CUHK-Shenzhen
+        &nbsp; &nbsp; &nbsp;
+        <sup>2</sup>The Future Network of Intelligence Institue, CUHK-Shenzhen
+        &nbsp; &nbsp; &nbsp;
+    </p>
+    <p class="center_text" align="center">
+        Corresponding Email: &nbsp; &nbsp; haolinliu@link.cuhk.edu.cn&nbsp; &nbsp; hanxiaoguang@cuhk.edu.cn
+    </p>
+
+    <br>
+        <h3 class="w3-left-align" id="intro"><b>Introduction</b></h3>
+        <p>
+            We present a new framework to reconstruct holistic 3D indoor scenes including both room background and indoor objects from single-view images. Existing methods can only produce 3D shapes of indoor objects with limited geometry quality because of the heavy occlusion of indoor scenes.
+            To solve this, we propose an <b>instance-aligned</b> implicit function (<b>InstPIFu</b>) for detailed object reconstruction.
+            Combining with instance-aligned attention module, our method is empowered to decouple mixed local features toward the occluded instances.
+            Additionally, unlike previous methods that simply represents the room background as a 3D bounding box, depth map or a set of planes, we recover the fine geometry of the background via implicit representation.
+   Extensive experiments on the SUN-RGBD, Pix3D, 3DFUTURE, and 3DFRONT datasets demonstrate that our method outperforms existing approaches in both background and foreground object reconstruction.
+         <center>
+                <img src="teaser.png" style="max-width:100%" /><br>
+                <h7>
+                Figure1. Given a single indoor scene image, we reconstruct the holistic scene with detailed geometry, including the room background and indoor objects. From left to right: input image, the scene reconstructed by our method, results of Total3D, Im3D and our method in a different camera pose.
+                </h7>
+        </center>
+        </p>
+        <h3 class="w3-left-align" id="video_title"><b>Video</b></h3>
+        <p>
+        <iframe width="850" height="480" src="https://www.youtube.com/embed/38lTLptpQxs" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+        </p>
+
+        <h3 class="w3-left-align" id="publication"><b>Publication</b></h3>
+        Accepted by ECCV 2022 <br>
+        Paper - <a href="https://arxiv.org/pdf/2103.07894" target="__blank">ArXiv - pdf</a> (<a href="https://arxiv.org/abs/2103.07894" target="__blank">abs</a>)  | <a href="https://github.com/UncleMEDM/Refer-it-in-RGBD" target="__blank">GitHub</a>
+        <br>
+        If you find our work useful, please consider citing it:
+        <pre class="w3-panel w3-leftbar w3-light-grey" style="white-space: pre-wrap; font-family: monospace; font-size: 11px">
+
+
+        @inproceedings{liu2021refer,
+          title={Refer-it-in-RGBD: A Bottom-up Approach for 3D Visual Grounding in RGBD Images},
+          author={Liu, Haolin and Lin, Anran and Han, Xiaoguang and Yang, Lei and Yu, Yizhou and Cui, Shuguang},
+          booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+          pages={6032--6041},
+          year={2021}
+        }
+        </pre>
+
+    </div>
+
+
+</div>
+
+<br/>
+<br/>
+
 </body>
 </html>

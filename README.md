@@ -3,6 +3,7 @@
 This is the repository of our paper 'Towards High-Fidelity Single-view Holistic Reconstruction of Indoor Scenes' in ECCV 2022<br>
 Paper - <a href="https://arxiv.org/pdf/2103.07894" target="__blank">ArXiv - pdf</a> (<a href="https://arxiv.org/abs/2103.07894" target="__blank">abs</a>) 
 <br>
+Project Page: https://unclemedm.github.io/InstPIFu/ <br>
 
 # Code
 code will be released soon.
