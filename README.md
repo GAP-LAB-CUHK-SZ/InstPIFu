@@ -17,7 +17,7 @@ pip install requirements.txt
 ```
 
 # Data Preparation
-The prepare data for reproduction will be provided in a day or two.
+The prepare data for training will be provided in a day or two.
 
 # Code
 Codes for single-view object reconstruction is already released.
@@ -29,3 +29,5 @@ run the following commands for training:
 ```angular2html
 python main.py --mode train --config ./configs/train_instPIFu.yaml
 ```
+### Testing and Evaluation
+The code is still under testing, the weight for testing and evaluation script will be released in a few days
