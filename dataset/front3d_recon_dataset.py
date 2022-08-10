@@ -343,10 +343,9 @@ class Front3D_Recon_Dataset(Dataset):
                          "sequence_id": sequence["sequence_id"], "z_feat": z_feat, "K": K, "rot_matrix": rot_matrix,
                          "jid": jid, "bdb_grid": bdb_grid, "taskid": taskid, "obj_id": str(object_ind),
                          "obj_cam_center": obj_cam_center, "cls_codes": cls_codes.astype(np.float32),
-                         "img_coor": bdb_coor.astype(np.float32), "bbox_size": bbox_size,"mask":crop_mask}
+                         "img_coor": bdb_coor.astype(np.float32), "bbox_size": bbox_size}
             if self.config['data']['use_instance_mask']:
-                data_dict["mask"] = instance_mask
-                data_dict['img_coor'] = bdb_coor
+                data_dict["mask"] = crop_mask
             success_flag = True
 
         return data_dict
