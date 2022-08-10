@@ -1,0 +1,5 @@
+trimesh
+scikit-image
+tqdm
+pyyaml
+tensorboardX

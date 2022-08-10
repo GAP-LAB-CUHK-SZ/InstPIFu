@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from utils.net_util import *
+from net_utils.network_utils import *
 
 
 class HourGlass(nn.Module):

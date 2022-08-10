@@ -1,16 +1,13 @@
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from models.PIFu.BasePIFuNet import BasePIFuNet
-from models.PIFu.SurfaceClassifier import SurfaceClassifier
-from models.PIFu.HGFilters import *
-from utils.net_util import init_net
-from models.modules.resnet import resnet18_full
+from models.instPIFu.BasePIFuNet import BasePIFuNet
+from models.instPIFu.SurfaceClassifier import SurfaceClassifier
+from models.instPIFu.HGFilters import *
+from net_utils.init_net import init_net
 from skimage import measure
 import trimesh
-from models.PIFu.Embedder import get_embedder
+from models.instPIFu.PositionEmbedder import get_embedder
 import pickle as p
-from models.PIFu.Attention_module import Attention_RoI_Module
+from models.instPIFu.Attention_module import Attention_RoI_Module
+import numpy as np
 
 def positionalEncoder(cam_points, embedder, output_dim):
     cam_points = cam_points.permute(0, 2, 1)#[B,N,3]
@@ -19,7 +16,8 @@ def positionalEncoder(cam_points, embedder, output_dim):
     output = torch.reshape(embedded, [cam_points.shape[0], cam_points.shape[1], output_dim])
     return output.permute(0, 2, 1)
 
-class HGPIFuNet_shareencode(BasePIFuNet):
+
+class InstPIFu(BasePIFuNet):
     '''
     HG PIFu network uses Hourglass stacks as the image filter.
     It does the following:
@@ -37,7 +35,7 @@ class HGPIFuNet_shareencode(BasePIFuNet):
                  projection_mode='orthogonal',
                  error_term=nn.L1Loss(),
                  ):
-        super(HGPIFuNet_shareencode, self).__init__(
+        super(InstPIFu, self).__init__(
             projection_mode=projection_mode,
             error_term=error_term)
 
@@ -49,7 +47,7 @@ class HGPIFuNet_shareencode(BasePIFuNet):
         self.image_filter = HGFilter(opt)
 
         if self.config['data']['use_positional_embedding']:
-            self.origin_embedder,self.embedder_outDim=get_embedder(self.config['data']['multires'],log_sampling=True)
+            self.origin_embedder,self.embedder_outDim=get_embedder(self.config['model']['multires'],log_sampling=True)
             self.embedder=positionalEncoder
 
         self.surface_classifier = SurfaceClassifier(
@@ -86,14 +84,9 @@ class HGPIFuNet_shareencode(BasePIFuNet):
                 nn.Conv2d(in_channels=64, out_channels=1, kernel_size=1),
                 nn.Sigmoid()
             )
-        self.global_detach=self.config['model']['global_detach']
-        self.use_channel_atten=self.config['model']['use_channel_atten']
-        self.use_pixel_atten=self.config['model']['use_pixel_atten']
         if self.config['model']['use_atten']:
             self.post_op_module=Attention_RoI_Module(img_feat_channel=256,
-                                                   global_dim=256+9,hidden_dim=256,
-                                                   global_detach=self.global_detach,use_pixel_atten=self.use_pixel_atten,
-                                                     use_channel_atten=self.use_channel_atten,roi_align=self.config['model']['use_roi_align'])
+                                                   global_dim=256+9)
         self.global_encoder=nn.Sequential(
             nn.Conv2d(in_channels=256,out_channels=128,kernel_size=3,padding=1),
             nn.ReLU(),
@@ -163,6 +156,7 @@ class HGPIFuNet_shareencode(BasePIFuNet):
         z_feat=z_feat
         #z_feat.requires_grad=True
         self.z_feat=z_feat
+        '''extract global feature from feature map from hourglass network'''
         last_roi_feat=F.grid_sample(self.im_feat_list[-1], bdb_grid, align_corners=True, mode='bilinear')
         self.global_feat=self.global_encoder(last_roi_feat)
         #print(self.global_feat.shape)
@@ -172,35 +166,28 @@ class HGPIFuNet_shareencode(BasePIFuNet):
 
         self.intermediate_preds_list = []
 
-        if self.config['model']['global_recon']:
-            if self.config['data']['use_positional_embedding']:
-                position_feat = self.embedder(points.transpose(1,2), self.origin_embedder, self.embedder_outDim)
-                point_global_feat_list = [position_feat, z_feat.transpose(1, 2),
-                                         cls_codes.unsqueeze(2).repeat(1, 1, points.shape[1])]
-            else:
-                point_global_feat_list = [points.transpose(1,2),z_feat.transpose(1,2),cls_codes.unsqueeze(2).repeat(1,1,points.shape[1])]
-                #print(point_local_feat_list[0].shape,points.shape)
-            point_global_feat_list.append(self.global_feat.unsqueeze(2).repeat(1, 1, points.shape[1]))
-            global_point_feat=torch.cat(point_global_feat_list,dim=1)
-            global_pred=self.global_surface_classifier(global_point_feat)
-            self.intermediate_preds_list.append(global_pred)
+        '''reconstruction using only the global feature'''
+        if self.config['data']['use_positional_embedding']:
+            position_feat = self.embedder(points.transpose(1,2), self.origin_embedder, self.embedder_outDim)
+            point_global_feat_list = [position_feat, z_feat.transpose(1, 2),
+                                     cls_codes.unsqueeze(2).repeat(1, 1, points.shape[1])]
+        else:
+            point_global_feat_list = [points.transpose(1,2),z_feat.transpose(1,2),cls_codes.unsqueeze(2).repeat(1,1,points.shape[1])]
+            #print(point_local_feat_list[0].shape,points.shape)
+        point_global_feat_list.append(self.global_feat.unsqueeze(2).repeat(1, 1, points.shape[1]))
+        global_point_feat=torch.cat(point_global_feat_list,dim=1)
+        global_pred=self.global_surface_classifier(global_point_feat)
+
+        self.intermediate_preds_list.append(global_pred)
         self.mask_list=[]
-        self.atten_weight_list=[]
         self.channel_atten_list=[]
         for im_feat in self.im_feat_list:
             if self.config['model']['use_atten']:
                 ret_dict=self.post_op_module(im_feat,torch.cat([self.global_feat,cls_codes],dim=1),bdb_grid)
                 roi_feat=ret_dict["roi_feat"]
-                if self.config['model']['use_pixel_atten']:
-                    pixel_atten_weight=ret_dict['pixel_atten_weight']
-                    self.atten_weight_list.append(pixel_atten_weight)
-                if self.config['model']['use_channel_atten']:
-                    self.channel_atten_list.append(ret_dict['channel_atten_weight'])
+                self.channel_atten_list.append(ret_dict['channel_atten_weight'])
             else:
-                if self.config['model']['use_roi_align']:
-                    roi_feat = F.grid_sample(im_feat, bdb_grid, align_corners=True, mode='bilinear')
-                else:
-                    roi_feat=im_feat
+                roi_feat = F.grid_sample(im_feat, bdb_grid, align_corners=True, mode='bilinear')
             if self.config['data']['use_instance_mask']:
                 pred_mask=self.mask_decoder(roi_feat)
                 self.mask_list.append(pred_mask)
@@ -214,12 +201,8 @@ class HGPIFuNet_shareencode(BasePIFuNet):
 
             if self.opt["model"]["skip_hourglass"]:
                 point_local_feat_list.append(tmpx_local_feature)
-            if self.config['model']['use_global_feat']:
-                point_local_feat_list.append(self.global_feat.unsqueeze(2).repeat(1,1,points.shape[1]))
-            #for item in point_local_feat:
-            #    print(item.shape)
+            point_local_feat_list.append(self.global_feat.unsqueeze(2).repeat(1,1,points.shape[1]))
             point_local_feat = torch.cat(point_local_feat_list, 1)
-            #print(point_local_feat.shape)
 
             # out of image plane is always set to 0
             pred=self.surface_classifier(point_local_feat)
@@ -254,7 +237,7 @@ class HGPIFuNet_shareencode(BasePIFuNet):
                 mask_error+=nn.MSELoss()(pred_mask,F.interpolate(self.mask_label,size=(pred_mask.shape[2],pred_mask.shape[3]),mode="nearest"))
             self.mask_loss=mask_error/len(self.mask_list)
             return nss_error*0.1+uni_error*1 + self.mask_loss
-        else:
+        elif self.config['data']['dataset']=="front3d_recon":
             error = 0
             for preds in self.intermediate_preds_list:
                 # print(preds.shape,self.labels.shape)
@@ -272,10 +255,6 @@ class HGPIFuNet_shareencode(BasePIFuNet):
     def forward(self, data_dict):
         # Get image feature
         images, points, labels,img_coor,cls_codes = data_dict["whole_image"],data_dict["samples"],data_dict["inside_class"],data_dict["img_coor"],data_dict["cls_codes"]
-        if self.config['model']['use_roi_align']:
-            images=data_dict["whole_image"]
-        else:
-            images=data_dict["image"]
         patch=data_dict["patch"]
         z_feat=data_dict["z_feat"]
         bdb_grid=data_dict['bdb_grid']
@@ -300,34 +279,30 @@ class HGPIFuNet_shareencode(BasePIFuNet):
         if self.config['data']['dataset'] == "pix3d_recon":
             nss_pred_acc=torch.mean(1-torch.abs(pred_occ[:,0:2048]-self.labels[:,0:2048]))
             uni_pred_acc=torch.mean(1-torch.abs(pred_occ[:,2048:]-self.labels[:,2048:]))
-        else:
+            loss_info = {
+                "loss": error * 10,
+                "nss_pred_acc": nss_pred_acc,
+                "uni_pred_acc": uni_pred_acc,
+                "nss_recon_loss": self.nss_recon_loss,
+                "uni_recon_loss": self.uni_recon_loss
+            }
+        elif self.config['data']['dataset'] == "front3d_recon":
             pred_acc=torch.mean(1-torch.abs(pred_occ-self.labels))
+            loss_info = {
+                "loss": error,
+                "pred_acc": pred_acc,
+                "recon_loss": self.recon_loss,
+            }
+            loss_info['mask_loss'] = self.mask_loss
+            atten_weight = self.channel_atten_list[-1]
+            max_atten = torch.max(atten_weight)
+            min_atten = torch.min(atten_weight)
+            loss_info["max_atten"] = max_atten
+            loss_info["min_atten"] = min_atten
         ret_dict={
             "pred_class":res,
         }
         ret_dict["pred_mask"]=self.mask_list[-1]
-        if self.config['data']['dataset'] == "pix3d_recon":
-            loss_info = {
-                "loss": error*10,
-                "nss_pred_acc":nss_pred_acc,
-                "uni_pred_acc":uni_pred_acc,
-                "nss_recon_loss":self.nss_recon_loss,
-                "uni_recon_loss": self.uni_recon_loss
-            }
-
-        else:
-            loss_info={
-                "loss":error,
-                "pred_acc":pred_acc,
-                "recon_loss":self.recon_loss,
-            }
-        loss_info['mask_loss']=self.mask_loss
-        atten_weight=self.channel_atten_list[-1]
-        max_atten=torch.max(atten_weight)
-        min_atten=torch.min(atten_weight)
-        loss_info["max_atten"]=max_atten
-        loss_info["min_atten"]=min_atten
-
         return ret_dict,loss_info
     def extract_mesh(self,data_dict,marching_cube_resolution=64):
         whole_image,image, cls_codes =data_dict["whole_image"],data_dict["image"],data_dict["cls_codes"]
