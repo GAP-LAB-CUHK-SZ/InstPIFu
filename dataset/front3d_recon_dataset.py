@@ -303,10 +303,10 @@ class Front3D_Recon_Dataset(Dataset):
             '''compute sample coordinate in the bounding box'''
             bdb_xcoor = img_samples[:, 0] / img_samples[:, 2]
             bdb_ycoor = img_samples[:, 1] / img_samples[:, 2]
-            bdb_xcoor = bdb_xcoor - (bdb[0] + bdb[2]) / 4
-            bdb_ycoor = bdb_ycoor - (bdb[1] + bdb[3]) / 4
-            bdb_xcoor = bdb_xcoor / (bdb[2] - bdb[0]) * 4  # -1 ~ 1
-            bdb_ycoor = bdb_ycoor / (bdb[3] - bdb[1]) * 4  # -1 ~ 1
+            bdb_xcoor = bdb_xcoor - (bdb[0] + bdb[2]) / 2
+            bdb_ycoor = bdb_ycoor - (bdb[1] + bdb[3]) / 2
+            bdb_xcoor = bdb_xcoor / (bdb[2] - bdb[0]) * 2  # -1 ~ 1
+            bdb_ycoor = bdb_ycoor / (bdb[3] - bdb[1]) * 2  # -1 ~ 1
             bdb_coor = np.concatenate([bdb_xcoor[:, np.newaxis], bdb_ycoor[:, np.newaxis]], axis=1)
 
             '''crop the object'''
