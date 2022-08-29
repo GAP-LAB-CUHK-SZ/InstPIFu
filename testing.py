@@ -14,7 +14,6 @@ def Recon_tester(cfg,model,loader,device,checkpoint):
     if config['resume'] == True:
         print("loading from",config['weight'])
         checkpoint.load(config['weight'])
-        #load_parallel_checkpoints(config['weight'],model,strict=True)
     model.eval()
     for batch_id, data_batch in enumerate(loader):
         for key in data_batch:
@@ -30,10 +29,8 @@ def Recon_tester(cfg,model,loader,device,checkpoint):
         print(msg)
         '''export result of object reconstruction'''
         if config['method']=="instPIFu":
-            #jid=data_batch['jid'][0]
             taskid=data_batch['taskid'][0]
             object_id=data_batch["obj_id"][0]
             m_save_path=os.path.join(log_dir,taskid+"_"+str(object_id)+".ply")
             print(m_save_path,data_batch['jid'][0])
-            #m_save_path=os.path.join(log_dir,taskid+".ply")
             mesh.export(m_save_path)

@@ -1,0 +1,49 @@
+resume: True
+weight: ./checkpoints/instPIFu_0810/model_best.pth
+finetune: False
+method: instPIFu
+exp_name: instPIFu_0810_recon_result
+phase: reconstruction
+debug: True
+device:
+  use_gpu: True
+  gpu_ids: '6'
+data:
+  dataset: front3d_recon
+  data_path: ./data/3dfront/prepare_data
+  split_dir: ./data/3dfront/split
+  occ_path: ./data/3dfront/occ
+  mask_path: ./data/3dfront/mask
+  #class_name: ['chair','table','sofa','cabinet','night_stand','bookshelf','bed','desk','dresser']
+  class_name: all
+  distributed: True
+  load_dynamic: True
+  batch_size: 1
+  num_workers: 1
+  use_pred_pose: False
+  pred_pose_path: ./checkpoints/total3d_1113_result
+  use_aug: True
+  use_positional_embedding: True
+  use_instance_mask: True
+  use_crop: True
+  use_padding: False
+  marching_cube_resolution: 256
+model:
+  mlp_dim: [549, 1024, 512, 256, 128, 1]
+  no_residual: False
+  num_stack: 4
+  norm: group
+  hg_down: ave_pool
+  num_hourglass: 2
+  hourglass_dim: 256
+  skip_hourglass: False
+  multires: 4
+  use_atten: True
+  global_recon: True
+  global_mlp_dim: [293,512,256,128,1]
+other:
+  model_save_dir: ./checkpoints
+  dump_result: True
+  dump_interval: 1000
+
+

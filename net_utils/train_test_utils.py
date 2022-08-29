@@ -239,14 +239,14 @@ class CheckpointIO(object):
                     if key=="net":
                         new_dict={}
                         for weight_key in checkpoint[key].keys():
-                            '''remove the module. prefix
+                            '''remove the module. prefix'''
                             if weight_key.startswith("module."):
                                 k_ = weight_key[7:]
                                 new_dict[k_] = checkpoint[key][weight_key]
                             else:
                                 new_dict[weight_key] = checkpoint[key][weight_key]
-                            '''
-                            new_dict[weight_key] = checkpoint[key][weight_key]
+
+                            #new_dict[weight_key] = checkpoint[key][weight_key]
                         value.load_state_dict(new_dict,strict=True)
                     else:
                         value.load_state_dict(checkpoint[key])

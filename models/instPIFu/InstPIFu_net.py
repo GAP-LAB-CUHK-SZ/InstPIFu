@@ -316,21 +316,25 @@ class InstPIFu(BasePIFuNet):
         obj_cam_center=data_dict["obj_cam_center"]
         bdb_grid=data_dict['bdb_grid']
         transforms = None
-        if self.config['model']['use_pixel_atten']:
-            self.rel_coord=data_dict["rel_coord"]
-            self.cls_codes=data_dict["cls_codes"]
         self.filter(whole_image, patch)
 
         x_coor = torch.linspace(-1.2, 1.2, steps=marching_cube_resolution).float().to(image.device)
         y_coor = torch.linspace(-1.2, 1.2, steps=marching_cube_resolution).float().to(image.device)
         z_coor = torch.linspace(-1.2, 1.2, steps=marching_cube_resolution).float().to(image.device)
         X, Y, Z = torch.meshgrid(x_coor, y_coor, z_coor)
+
         samples_incan = torch.cat([X[:, :, :, None], Y[:, :, :, None], Z[:, :, :, None]], dim=3).unsqueeze(0)
         samples_incan=samples_incan.view(samples_incan.shape[0],marching_cube_resolution**3,3)
-        #print(samples_incan.shape,rot_matrix.shape)
-        input_samples_incan=samples_incan
-        samples_inrecan = torch.einsum('ijk,ikq->ijq',input_samples_incan, rot_matrix.transpose(1,2))
+
+        '''adds some test sample to debug'''
+        if self.config['debug']:
+            test_samples_incan = data_dict["samples"]
+            samples_incan=torch.cat([samples_incan,test_samples_incan],dim=1)
+
+
+        samples_inrecan = torch.einsum('ijk,ikq->ijq',samples_incan, rot_matrix.transpose(1,2))
         z_feat=samples_inrecan[:,:,2:3]
+
         samples_incam=samples_incan*bbox_size.unsqueeze(1)/2
         samples_incam=torch.einsum('ijk,ikq->ijq',samples_incam,rot_matrix.transpose(1,2))
         samples_incam[:,:,0:2]=-samples_incam[:,:,0:2] #y down coordinate
@@ -353,10 +357,26 @@ class InstPIFu(BasePIFuNet):
         #print(x_coor)
         img_coor=torch.cat([x_coor[:,:,None],y_coor[:,:,None]],dim=2)
 
+        '''conduct test on prepared sampled'''
+        if self.config['debug']:
+            #print(samples_incam[:,-4096:].shape,img_coor[:,0:-4096:].shape,data_dict["inside_class"].shape)
+            self.query(points=samples_incan[:,-4096:],z_feat=z_feat[:,-4096:,],transforms=transforms,cls_codes=cls_codes,labels=data_dict["inside_class"],
+                       img_coor=img_coor[:,-4096:],bdb_grid=bdb_grid)
+            res=self.get_preds()
+            pred_occ = torch.zeros(res.shape).to(res.device)
+            pred_occ[res > 0.5] = 1
+            pred_occ[res < 0.5] = 0
+            pred_acc = torch.mean(1 - torch.abs(pred_occ - self.labels))
+            print("debuging test accuracy is %f"%(pred_acc))
         # Phase 2: point query
-        sample_list = torch.split(samples_incan, 200000, dim=1)
-        img_coor_list = torch.split(img_coor, 200000, dim=1)
-        z_feat_list = torch.split(z_feat, 200000, dim=1)
+        if self.config['debug']:
+            sample_list = torch.split(samples_incan[:,0:-4096], 200000, dim=1)
+            img_coor_list = torch.split(img_coor[:,0:-4096], 200000, dim=1)
+            z_feat_list = torch.split(z_feat[:,0:-4096], 200000, dim=1)
+        else:
+            sample_list = torch.split(samples_incan, 200000, dim=1)
+            img_coor_list = torch.split(img_coor, 200000, dim=1)
+            z_feat_list = torch.split(z_feat, 200000, dim=1)
         pred_list = []
         for i in range(len(sample_list)):
             # Phase 2: point query
