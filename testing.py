@@ -32,5 +32,6 @@ def Recon_tester(cfg,model,loader,device,checkpoint):
             taskid=data_batch['taskid'][0]
             object_id=data_batch["obj_id"][0]
             m_save_path=os.path.join(log_dir,taskid+"_"+str(object_id)+".ply")
-            print(m_save_path,data_batch['jid'][0])
+            #print(m_save_path,data_batch['jid'][0])
+            print("saving to %s"%(m_save_path))
             mesh.export(m_save_path)
