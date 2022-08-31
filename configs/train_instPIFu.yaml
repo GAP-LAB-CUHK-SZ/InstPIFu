@@ -1,8 +1,8 @@
 resume: False
-weight: ./checkpoints/instPIFu_0810/model_latest.pth
+weight: ./checkpoints/instPIFu_0829/model_latest.pth
 finetune: False
 method: instPIFu
-exp_name: instPIFu_0810
+exp_name: instPIFu_0830
 phase: reconstruction
 device:
   use_gpu: True
@@ -10,12 +10,13 @@ device:
 data:
   dataset: front3d_recon
   data_path: ./data/3dfront/prepare_data
-  split_dir: ./data/3dfront/split
+  split_dir: ./data/3dfront/split-filter
   occ_path: ./data/3dfront/occ
   mask_path: ./data/3dfront/mask
   class_name: ['chair','table','sofa','cabinet','night_stand','bookshelf','bed','desk','dresser']
+  test_class_name: all
   distributed: True
-  load_dynamic: True
+  load_dynamic: False
   batch_size: 16
   num_workers: 16
   use_pred_pose: False

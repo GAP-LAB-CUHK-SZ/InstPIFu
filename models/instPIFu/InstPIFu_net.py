@@ -8,6 +8,7 @@ from models.instPIFu.PositionEmbedder import get_embedder
 import pickle as p
 from models.instPIFu.Attention_module import Attention_RoI_Module
 import numpy as np
+from models.modules.resnet import resnet18_full,resnet18_small_stride
 
 def positionalEncoder(cam_points, embedder, output_dim):
     cam_points = cam_points.permute(0, 2, 1)#[B,N,3]
@@ -87,31 +88,40 @@ class InstPIFu(BasePIFuNet):
         if self.config['model']['use_atten']:
             self.post_op_module=Attention_RoI_Module(img_feat_channel=256,
                                                    global_dim=256+9)
-        self.global_encoder=nn.Sequential(
-            nn.Conv2d(in_channels=256,out_channels=128,kernel_size=3,padding=1),
+        # self.global_encoder=nn.Sequential(
+        #     nn.Conv2d(in_channels=256,out_channels=128,kernel_size=3,padding=1),
+        #     nn.ReLU(),
+        #     nn.MaxPool2d(2,2), #32
+        #     nn.Conv2d(in_channels=128, out_channels=128, kernel_size=3, padding=1),
+        #     nn.ReLU(),
+        #     nn.MaxPool2d(2, 2), #16
+        #     nn.Conv2d(in_channels=128, out_channels=64, kernel_size=3, padding=1),
+        #     nn.ReLU(),
+        #     nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, padding=1),
+        #     nn.ReLU(),
+        #     nn.MaxPool2d(2, 2), # 8
+        #     nn.Conv2d(in_channels=64, out_channels=32, kernel_size=3, padding=1),
+        #     nn.ReLU(),
+        #     nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, padding=1),
+        #     nn.ReLU(),
+        #     nn.MaxPool2d(2, 2),  # 4
+        #     nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, padding=1),
+        #     nn.ReLU(),
+        #     nn.Conv2d(in_channels=32, out_channels=16, kernel_size=3, padding=1),
+        #     nn.ReLU(),
+        #     nn.Flatten(),
+        #     nn.Linear(256,256),
+        #     nn.ReLU(),
+        #     nn.Linear(256,256)
+        # )
+        self.global_encoder = nn.Sequential(
+            nn.Conv2d(in_channels=256,out_channels=64,kernel_size=3,padding=1),
+            resnet18_small_stride(pretrained=False,input_channels=64),
+            nn.Linear(2048, 1024),
             nn.ReLU(),
-            nn.MaxPool2d(2,2), #32
-            nn.Conv2d(in_channels=128, out_channels=128, kernel_size=3, padding=1),
+            nn.Linear(1024, 512),
             nn.ReLU(),
-            nn.MaxPool2d(2, 2), #16
-            nn.Conv2d(in_channels=128, out_channels=64, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(2, 2), # 8
-            nn.Conv2d(in_channels=64, out_channels=32, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(2, 2),  # 4
-            nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(in_channels=32, out_channels=16, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.Flatten(),
-            nn.Linear(256,256),
-            nn.ReLU(),
-            nn.Linear(256,256)
+            nn.Linear(512, 256)
         )
 
     def filter(self, images,patch):
@@ -122,8 +132,8 @@ class InstPIFu(BasePIFuNet):
         '''
         self.im_feat_list, self.tmpx, self.normx = self.image_filter(images)
         # If it is not in training, only produce the last im_feat
-        if not self.training:
-            self.im_feat_list = [self.im_feat_list[-1]]
+        #if not self.training:
+        #    self.im_feat_list = [self.im_feat_list[-1]]
 
     def query(self, points, z_feat,img_coor, bdb_grid,cls_codes,transforms=None, labels=None):
         '''
@@ -157,8 +167,11 @@ class InstPIFu(BasePIFuNet):
         #z_feat.requires_grad=True
         self.z_feat=z_feat
         '''extract global feature from feature map from hourglass network'''
-        last_roi_feat=F.grid_sample(self.im_feat_list[-1], bdb_grid, align_corners=True, mode='bilinear')
+        '''try it from the first layer'''
+        #print(self.im_feat_list[0].shape)
+        last_roi_feat=F.grid_sample(self.im_feat_list[0], bdb_grid, align_corners=True, mode='bilinear')
         self.global_feat=self.global_encoder(last_roi_feat)
+        #print(self.global_feat.shape)
         #print(self.global_feat.shape)
 
         if self.opt["model"]["skip_hourglass"]:

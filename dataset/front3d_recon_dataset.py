@@ -105,7 +105,10 @@ class Front3D_Recon_Dataset(Dataset):
         super(Front3D_Recon_Dataset, self).__init__()
         self.mode = mode
         self.config = config
-        classname = self.config['data']['class_name']
+        if mode=="train":
+            classname = self.config['data']['class_name']
+        else:
+            classname = self.config['data']['test_class_name']
         self.use_pred_pose = self.config['data']['use_pred_pose']
         if isinstance(classname, list):
             self.multi_class = True
@@ -120,10 +123,17 @@ class Front3D_Recon_Dataset(Dataset):
             self.split_path = os.path.join(self.config['data']['split_dir'], mode, classname + ".json")
             with open(self.split_path, 'r') as f:
                 self.split = json.load(f)
-        print(len(self.split))
+        #print(len(self.split))
+        #print(self.split)
         '''only test 2000 samples'''
         if mode=="test":
             self.split=self.split[0:2000]
+
+        for i in range(len(self.split)):
+            filename=self.split[i][0]
+            if ".pkl" in filename:
+                taskid=filename.rstrip(".pkl")
+            self.split[i][0]=taskid
 
         if self.config['data']['load_dynamic'] == False:
             self.__load_data()
@@ -154,6 +164,8 @@ class Front3D_Recon_Dataset(Dataset):
         self.occ_inside_data_dict = {}
         self.occ_outside_data_dict = {}
         self.instance_mask_dict = {}
+        jid_list=[]
+        print("loading prepare data")
         for (taskid, objid) in tqdm(self.split):
             if taskid not in self.prepare_data_dict:
                 prepare_data_path = os.path.join(self.config['data']['data_path'], self.mode, taskid + ".pkl")
@@ -163,6 +175,10 @@ class Front3D_Recon_Dataset(Dataset):
             boxes = self.prepare_data_dict[taskid]['boxes']
             object_ind = objid
             jid = boxes['jid'][object_ind]
+            jid_list.append(jid)
+        jid_list=list(set(jid_list))
+        print("loading object occupancy data")
+        for jid in tqdm(jid_list):
             if jid not in self.occ_inside_data_dict:
                 inside_occ_path = os.path.join(self.config['data']['occ_path'], jid, "inside_points.obj")
                 outside_occ_path = os.path.join(self.config['data']['occ_path'], jid, 'outside_points.obj')
