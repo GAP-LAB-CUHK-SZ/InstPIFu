@@ -1,6 +1,6 @@
 # Dataloader of InstPIFu.
 # author: LiuHaolin
-# date: Aug, 2020
+# date: Aug, 2022
 import os
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader

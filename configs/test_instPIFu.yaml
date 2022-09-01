@@ -7,7 +7,7 @@ phase: reconstruction
 debug: True
 device:
   use_gpu: True
-  gpu_ids: '2'
+  gpu_ids: '6'
 data:
   dataset: front3d_recon
   data_path: ./data/3dfront/prepare_data
