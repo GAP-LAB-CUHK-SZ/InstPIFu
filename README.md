@@ -41,6 +41,11 @@ you can download it for testing on 3D-FRONT data.
 The weight entry in the config file is required to be modified to the weight file that you want to test. 
 The mesh files will be saved in ./checkpoints/<exp_name>/xxx.ply
 <\br>
+For evaluation, gaps is required to be installed for conduct ICP alignment. Run the following commands to install gaps:
+```angular2html
+cd external
+bash build_gaps.sh
+```
 run the following commands for evaluation:
 ```angular2html
 python evaluate_object_reconstruction.py --result_dir ./checkpoints/<exp_name> --gt_dir ./Path/to/gt/watertight/mesh
