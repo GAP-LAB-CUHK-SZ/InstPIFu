@@ -46,6 +46,7 @@ For evaluation, gaps is required to be installed for conduct ICP alignment. Run 
 cd external
 bash build_gaps.sh
 ```
+Download the <a href="https://cuhko365-my.sharepoint.com/:u:/g/personal/115010192_link_cuhk_edu_cn/Eb5ntiV22HlJmiQWNsNQycsBRovAVlTpbiFEV5yeITdYGQ?e=QbzaTG" target="__blank">ground truth mesh in test set </a>, and unzip it.
 run the following commands for evaluation:
 ```angular2html
 python evaluate_object_reconstruction.py --result_dir ./checkpoints/<exp_name> --gt_dir ./Path/to/gt/watertight/mesh
