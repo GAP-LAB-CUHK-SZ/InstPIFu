@@ -19,7 +19,7 @@ pip install -r requirements.txt
 # Data Preparation
 ### 3D FRONT dataset
 The prepare data for training is in the following link: <a href="https://cuhko365-my.sharepoint.com/:f:/g/personal/115010192_link_cuhk_edu_cn/Eg99g4P1VMVJoZ5fz3lmDkABvj7Gc7yCjq-qBuYNqWjl2w?e=72lix4" target="__blank">training_data</a>.
-Download these three .zip files, and unzip them under ./data/3dfront. 
+Download prepare_data.zip, occ.zip, mask.zip, and unzip them under ./data/3dfront. 
 # Code
 Codes for single-view object reconstruction is already released.
 The codes for 3D object detection and backgrounding reconstruction will be updated in a few days.
@@ -30,5 +30,25 @@ run the following commands for training:
 ```angular2html
 python main.py --mode train --config ./configs/train_instPIFu.yaml
 ```
+After the training is finished, the weight file will be stored in ./checkpoints/<exp_name>/model_best.pth.
 ### Testing and Evaluation
-The code is still under testing, the weight for testing and evaluation script will be released in a few days
+run the following commands to extract mesh result:
+```angular2html
+python main.py --mode test --config ./configs/test_instPIFu.yaml
+```
+we provide weight file in <a href="https://cuhko365-my.sharepoint.com/:u:/g/personal/115010192_link_cuhk_edu_cn/EUCaLPeAr_9HhX05X6VMB30BEiK-mp4GKl1tmTJMOQL1ng?e=vuBMdu" target="__blank">model_best.pth</a>.
+you can download it for testing on 3D-FRONT data.
+The weight entry in the config file is required to be modified to the weight file that you want to test. 
+The mesh files will be saved in ./checkpoints/<exp_name>/xxx.ply
+<\br>
+run the following commands for evaluation:
+```angular2html
+python evaluate_object_reconstruction.py --result_dir ./checkpoints/<exp_name> --gt_dir ./Path/to/gt/watertight/mesh
+```
+evaluation is only conducted on 2000 samples inside ./data/3dfront/split/test.json
+evaluation results on 3D-FUTURE:
+
+| Category         | cabinet | chair | table | sofa | bed  | night_stand | Total |
+|:-----------------|:--------|:------|:------|:-----|:-----|:------------|:------|
+| Chamfer Distance | 4.25    | 9.93  | 15.00 | 6.42 | 9.92 | 17.08       | 10.61 |
+

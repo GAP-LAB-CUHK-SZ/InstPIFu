@@ -30,7 +30,7 @@ def parse_args():
     parser = argparse.ArgumentParser('totalindoorrecon evaluation')
     parser.add_argument('--result_dir', type=str,
                         help='folder contains the results of object mesh')
-    parser.add_argument('--gt_dir',type=str,help="folder containing the watertight ground truth mesh")
+    parser.add_argument('--gt_dir',type=str,default="/data3/haolin/data/3D-FUTURE-watertight/",help="folder containing the watertight ground truth mesh")
     return parser.parse_args()
 
 def delete_disconnected_component(mesh):
