@@ -59,6 +59,9 @@ evaluation results on 3D-FUTURE:
 |:-----------------|:--------|:------|:------|:-----|:-----|:------------|:------|
 | Chamfer Distance | 4.25    | 9.93  | 15.00 | 6.42 | 9.92 | 17.08       | 10.61 |
 
+# To Do
+- [] Codes for background reconstruction
+- [] Codes for 3D object detection
 # Citation
 If you find our work useful, please cite
 ```angular2
