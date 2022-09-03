@@ -31,7 +31,7 @@ run the following commands for training:
 python main.py --mode train --config ./configs/train_instPIFu.yaml
 ```
 After the training is finished, the weight file will be stored in ./checkpoints/<exp_name>/model_best.pth.
-### Testing and Evaluation
+### Testing
 run the following commands to extract mesh result:
 ```angular2html
 python main.py --mode test --config ./configs/test_instPIFu.yaml
@@ -41,6 +41,7 @@ you can download it for testing on 3D-FRONT data.
 The weight entry in the config file is required to be modified to the weight file that you want to test. 
 The mesh files will be saved in ./checkpoints/<exp_name>/xxx.ply
 <\br>
+### Evaluation
 For evaluation, gaps is required to be installed for conduct ICP alignment. Run the following commands to install gaps:
 ```angular2html
 cd external
@@ -57,4 +58,15 @@ evaluation results on 3D-FUTURE:
 | Category         | cabinet | chair | table | sofa | bed  | night_stand | Total |
 |:-----------------|:--------|:------|:------|:-----|:-----|:------------|:------|
 | Chamfer Distance | 4.25    | 9.93  | 15.00 | 6.42 | 9.92 | 17.08       | 10.61 |
+
+# Citation
+If you find our work useful, please cite
+```angular2
+@inproceedings{liu2022towards,
+  title={Towards High-Fidelity Single-view Holistic Reconstruction of Indoor Scenes},
+  author={Liu, Haolin and Zheng, Yujian and Chen, Guanying and Cui, Shuguang and Han, Xiaoguang},
+  booktitle={Proceedings of European Conference on Computer Vision},
+  year={2022}
+}
+```
 
