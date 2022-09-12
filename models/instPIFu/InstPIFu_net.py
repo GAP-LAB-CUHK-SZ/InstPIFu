@@ -194,6 +194,8 @@ class InstPIFu(BasePIFuNet):
         self.intermediate_preds_list.append(global_pred)
         self.mask_list=[]
         self.channel_atten_list=[]
+        if self.training==False:
+            self.im_feat_list=[self.im_feat_list[-1]]
         for im_feat in self.im_feat_list:
             if self.config['model']['use_atten']:
                 ret_dict=self.post_op_module(im_feat,torch.cat([self.global_feat,cls_codes],dim=1),bdb_grid)
