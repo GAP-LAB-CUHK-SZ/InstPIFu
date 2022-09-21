@@ -194,8 +194,8 @@ class InstPIFu(BasePIFuNet):
         self.intermediate_preds_list.append(global_pred)
         self.mask_list=[]
         self.channel_atten_list=[]
-        if self.training==False:
-            self.im_feat_list=[self.im_feat_list[-1]]
+        #if self.training==False:
+        #self.im_feat_list=[self.im_feat_list[-1]]
         for im_feat in self.im_feat_list:
             if self.config['model']['use_atten']:
                 ret_dict=self.post_op_module(im_feat,torch.cat([self.global_feat,cls_codes],dim=1),bdb_grid)
@@ -212,14 +212,12 @@ class InstPIFu(BasePIFuNet):
                                          cls_codes.unsqueeze(2).repeat(1, 1, points.shape[1])]
             else:
                 point_local_feat_list = [self.index(roi_feat, xy), points.transpose(1,2),z_feat.transpose(1,2),cls_codes.unsqueeze(2).repeat(1,1,points.shape[1])]
-                #print(point_local_feat_list[0].shape,points.shape)
 
             if self.opt["model"]["skip_hourglass"]:
                 point_local_feat_list.append(tmpx_local_feature)
             point_local_feat_list.append(self.global_feat.unsqueeze(2).repeat(1,1,points.shape[1]))
             point_local_feat = torch.cat(point_local_feat_list, 1)
 
-            # out of image plane is always set to 0
             pred=self.surface_classifier(point_local_feat)
             self.intermediate_preds_list.append(pred)
         self.preds = self.intermediate_preds_list[-1].squeeze(1)
