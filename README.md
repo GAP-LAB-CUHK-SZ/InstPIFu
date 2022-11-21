@@ -59,8 +59,16 @@ evaluation results on 3D-FUTURE:
 |:-----------------|:--------|:------|:------|:-----|:-----|:------------|:------|
 | Chamfer Distance | 4.25    | 9.93  | 15.00 | 6.42 | 9.92 | 17.08       | 10.61 |
 
+## Background reconstruction
+### training
+run the following commands to train background reconstruction:
+```angular2html
+python main.py --mode train --config ./configs/train_bg_PIFu.yaml
+```
+This part is still under testing.
+
 # To Do
-- [ ] Codes for background reconstruction
+- [x] Codes for background reconstruction
 - [ ] Codes for 3D object detection
 # Citation
 If you find our work useful, please cite
