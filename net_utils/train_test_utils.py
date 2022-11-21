@@ -344,6 +344,9 @@ def get_model(cfg,device):
     if cfg['method']=="instPIFu":
         from models.instPIFu.InstPIFu_net import InstPIFu
         model=InstPIFu(cfg).to(device)
+    elif cfg['method']=="bgPIFu":
+        from models.bg_PIFu.BGPIFu_net import BGPIFu_Net
+        model=BGPIFu_Net(cfg).to(device)
     else:
         raise NotImplementedError
     return model
@@ -352,12 +355,15 @@ def get_dataloader(cfg,mode):
     if cfg['data']['dataset']=="front3d_recon":
         from dataset.front3d_recon_dataset import Front3D_Recon_dataloader
         dataloader=Front3D_Recon_dataloader(cfg,mode)
+    elif cfg['data']['dataset']=="front3d_bg":
+        from dataset.front3d_bg_dataset import Front3D_bg_Dataloader
+        dataloader=Front3D_bg_Dataloader(cfg,mode)
     else:
         raise NotImplementedError
     return dataloader
 
 def get_trainer(config):
-    if config["method"]=="instPIFu":
+    if config["method"]=="instPIFu" or config['method']=="bgPIFu":
         from training import Recon_trainer
         trainer=Recon_trainer
     else:

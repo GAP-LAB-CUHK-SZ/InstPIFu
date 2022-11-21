@@ -1,16 +1,16 @@
 import os,sys
 from torch.utils.data import Dataset
+from torch.utils.data import DataLoader
 import json
-import pickle
+import pickle as p
 from PIL import Image
 from torchvision import transforms
 import random
 import numpy as np
-import glob
-import torch
 from PIL import ImageFile
 import cv2
 ImageFile.LOAD_TRUNCATED_IMAGES = True
+import json
 
 mean = [0.485, 0.456, 0.406]
 std = [0.229, 0.224, 0.225]
@@ -85,17 +85,24 @@ def read_obj_point(obj_path):
                 point[i] = float(point[i])
         return np.array(point_list)
 
-class FRONT_dataset(Dataset):
+class FRONT_bg_dataset(Dataset):
     def __init__(self,config,mode):
-        super(FRONT_dataset,self).__init__()
+        super(FRONT_bg_dataset,self).__init__()
         self.config=config
         self.mode=mode
-        self.data_path=os.path.join(self.config["data"]["data_path"],mode)
         self.occ_path=self.config['data']['occ_path']
-        self.split=os.listdir(self.data_path)
+        self.split_path=os.path.join(self.config['data']['split_path'],mode+'.json')
+        with open(self.split_path,'r') as f:
+            self.split=json.load(f)
+        # self.__load_data()
+        # self.render_list=list(self.data.keys())
 
     def __len__(self):
         return len(self.split)
+    #
+    # def __load_data(self):
+    #     with open(self.data_path,'rb') as f:
+    #         self.data=p.load(f)
 
     def rotate_image(self, image, angle, flag=Image.BILINEAR):
         result = image.rotate(angle, resample=flag)
@@ -136,23 +143,23 @@ class FRONT_dataset(Dataset):
     def __getitem__(self,index):
         success_flag = False
         while success_flag == False:
-            select_folder=self.split[index]
-            folder_id=select_folder[10:]
+            render_id,scene_id=self.split[index]['render_id'],self.split[index]['scene_id']
             index = np.random.randint(0, self.__len__())
-            image_path=os.path.join(self.data_path,select_folder,"img.jpg")
-            json_path=os.path.join(self.data_path,select_folder,"desc.json")
-            with open(json_path,'r') as f:
-                meta_data=json.load(f)
-            #print(meta_data)
-            scene_id=meta_data["scene_id"]
-            intrinsic=np.array(meta_data["bbox_infos"]["camera"]["K"]).reshape(3,3)
+            #print(render_id)
+            prepare_data_path = os.path.join(self.config['data']['data_path'], self.mode, render_id + ".pkl")
+            if os.path.exists(prepare_data_path)==False:
+                #print(prepare_data_path,"does not exist")
+                continue
+            with open(prepare_data_path,'rb') as f:
+                prepare_data=p.load(f)
+            intrinsic=prepare_data['camera']['K'].copy()
             intrinsic=np.abs(intrinsic)
             intrinsic_matrix=np.zeros((4,4))
             intrinsic_matrix[0:3,0:3]=intrinsic
             intrinsic_matrix[3,3]=1
 
-            inside_path=os.path.join(self.occ_path,select_folder,"outside_points.obj")
-            outside_path=os.path.join(self.occ_path,select_folder,"inside_points.obj")
+            inside_path=os.path.join(self.occ_path,render_id,"outside_points.obj")
+            outside_path=os.path.join(self.occ_path,render_id,"inside_points.obj")
             if os.path.isfile(inside_path)==False or os.path.isfile(outside_path)==False:
                 print(inside_path)
                 continue
@@ -170,13 +177,16 @@ class FRONT_dataset(Dataset):
             success_flag = True
         scale_intrinsic = intrinsic_matrix
 
-        image=Image.open(image_path)
+        image=Image.fromarray(prepare_data['rgb_img'])
+        #print(scale_intrinsic, image.size)
         width, height = image.size
         image=image.resize((self.config["data"]["image_width"],self.config["data"]["image_height"]))
         input_height,input_width=self.config["data"]["image_height"],self.config["data"]["image_width"]
 
-        scale_intrinsic[0] = scale_intrinsic[0] / (width / input_width)
-        scale_intrinsic[1] = scale_intrinsic[1] / (height / input_height)
+        scale_intrinsic[0] = scale_intrinsic[0] / (width / input_width) /2  # it has extra divided by 2 since the loaded image is already downsampled by 2
+        scale_intrinsic[1] = scale_intrinsic[1] / (height / input_height) /2
+
+        #print(scale_intrinsic,image.size)
 
         rot_matrix = np.array([[1, 0, 0],
                                [0, 1, 0]])
@@ -223,10 +233,35 @@ class FRONT_dataset(Dataset):
         return_dict = {
             "image": image,
             "jid": scene_id,
-            "taskid":select_folder,
+            "taskid":render_id,
             "intrinsic": scale_intrinsic,
             "rot_matrix": rot_matrix,
             "M":M,
-            "sample_points":sample_points,
-            "label":label}
+            "samples":sample_points,
+            "inside_class":label}
         return return_dict
+
+def worker_init_fn(worker_id):
+    random_data = os.urandom(4)
+    base_seed = int.from_bytes(random_data, byteorder="big")
+    np.random.seed(base_seed + worker_id)
+def Front3D_bg_Dataloader(cfg,mode):
+    dataset=FRONT_bg_dataset(cfg,mode)
+    dataloader = DataLoader(dataset=dataset,
+                            num_workers=cfg['data']['num_workers'],
+                            batch_size=cfg['data']['batch_size'],
+                            shuffle=(mode == 'train'),
+                            worker_init_fn=worker_init_fn, pin_memory=True
+                            )
+    return dataloader
+
+
+if __name__=="__main__":
+    from configs.config_utils import CONFIG
+    config=CONFIG("./configs/train_bg_PIFu.yaml").config
+    dataset=FRONT_bg_dataset(config,"train")
+    for i in range(10):
+        data_batch=dataset.__getitem__(i)
+        for key in data_batch:
+            if not isinstance(data_batch[key],str):
+                print(data_batch[key].shape)

@@ -20,7 +20,7 @@ def positionalEncoder(cam_points, embedder, output_dim):
     return output.permute(0, 2, 1)
 
 
-class HGPIFuNet(BasePIFuNet):
+class BGPIFu_Net(BasePIFuNet):
     '''
     HG PIFu network uses Hourglass stacks as the image filter.
     It does the following:
@@ -38,7 +38,7 @@ class HGPIFuNet(BasePIFuNet):
                  projection_mode='orthogonal',
                  error_term=nn.L1Loss(),
                  ):
-        super(HGPIFuNet, self).__init__(
+        super(BGPIFu_Net, self).__init__(
             projection_mode=projection_mode,
             error_term=error_term)
 
@@ -102,8 +102,10 @@ class HGPIFuNet(BasePIFuNet):
         '''
         if labels is not None:
             self.labels = labels
+        '''
+        compute projection
+        '''
         img_coor = torch.einsum("ijk,ikq->ijq", points, intrinsic[:,0:3,0:3].transpose(1, 2))
-        #img_coor = torch.einsum("ijk,ikl->ijl", points, intrinsic[:,0:3,0:3].transpose(1, 2))
         x_coor = img_coor[:, :,0]/img_coor[:,:,2]
         y_coor = img_coor[:, :,1]/img_coor[:,:,2]
 
@@ -183,8 +185,8 @@ class HGPIFuNet(BasePIFuNet):
     def forward(self, data_dict):
         # Get image feature
         #rot matrix and M is for data augmentation
-        images,points,intrinsic,rot_matrix,M = data_dict["image"],data_dict["sample_points"],data_dict["intrinsic"],data_dict["rot_matrix"],data_dict["M"]
-        label=data_dict["label"]
+        images,points,intrinsic,rot_matrix,M = data_dict["image"],data_dict["samples"],data_dict["intrinsic"],data_dict["rot_matrix"],data_dict["M"]
+        label=data_dict["inside_class"]
         self.labels=label
         transforms = None
         self.filter(images)
