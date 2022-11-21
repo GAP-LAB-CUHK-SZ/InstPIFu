@@ -11,6 +11,7 @@ from PIL import ImageFile
 import cv2
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 import json
+import tqdm
 
 mean = [0.485, 0.456, 0.406]
 std = [0.229, 0.224, 0.225]
@@ -94,15 +95,41 @@ class FRONT_bg_dataset(Dataset):
         self.split_path=os.path.join(self.config['data']['split_path'],mode+'.json')
         with open(self.split_path,'r') as f:
             self.split=json.load(f)
+        self.load_dynamic=self.config['data']['load_dynamic']
+        #self.split=self.split[0:100]
+        if self.load_dynamic==False:
+            self.__load_data()
         # self.__load_data()
         # self.render_list=list(self.data.keys())
 
     def __len__(self):
         return len(self.split)
     #
-    # def __load_data(self):
-    #     with open(self.data_path,'rb') as f:
-    #         self.data=p.load(f)
+    def __load_data(self):
+        self.prepare_data_dict = {}
+        self.occ_inside_data_dict = {}
+        self.occ_outside_data_dict = {}
+        print("loading prepare data")
+        for item in tqdm.tqdm(self.split):
+            render_id,scene_id=item['render_id'],item['scene_id']
+            if render_id not in self.prepare_data_dict:
+                prepare_data_path = os.path.join(self.config['data']['data_path'], self.mode, render_id + ".pkl")
+                if os.path.exists(prepare_data_path)==False:
+                    continue
+                with open(prepare_data_path, 'rb') as f:
+                    sequence = p.load(f)
+                self.prepare_data_dict[render_id] = sequence
+            if render_id not in self.occ_inside_data_dict:
+                inside_occ_path = os.path.join(self.config['data']['occ_path'], render_id, "inside_points.obj")
+                outside_occ_path = os.path.join(self.config['data']['occ_path'], render_id, 'outside_points.obj')
+                if os.path.isfile(inside_occ_path) and os.path.isfile(outside_occ_path):
+                    inside_sample = read_obj_point(inside_occ_path)
+                    outside_sample = read_obj_point(outside_occ_path)
+                    self.occ_outside_data_dict[render_id] = outside_sample
+                    self.occ_inside_data_dict[render_id] = inside_sample
+                else:
+                    print(render_id, inside_occ_path)
+                    continue
 
     def rotate_image(self, image, angle, flag=Image.BILINEAR):
         result = image.rotate(angle, resample=flag)
@@ -146,27 +173,38 @@ class FRONT_bg_dataset(Dataset):
             render_id,scene_id=self.split[index]['render_id'],self.split[index]['scene_id']
             index = np.random.randint(0, self.__len__())
             #print(render_id)
-            prepare_data_path = os.path.join(self.config['data']['data_path'], self.mode, render_id + ".pkl")
-            if os.path.exists(prepare_data_path)==False:
-                #print(prepare_data_path,"does not exist")
-                continue
-            with open(prepare_data_path,'rb') as f:
-                prepare_data=p.load(f)
+            if self.load_dynamic==True:
+                prepare_data_path = os.path.join(self.config['data']['data_path'], self.mode, render_id + ".pkl")
+                if os.path.exists(prepare_data_path)==False:
+                    #print(prepare_data_path,"does not exist")
+                    continue
+                with open(prepare_data_path,'rb') as f:
+                    prepare_data=p.load(f)
+            else:
+                if render_id not in self.prepare_data_dict:
+                    continue
+                prepare_data=self.prepare_data_dict[render_id]
             intrinsic=prepare_data['camera']['K'].copy()
             intrinsic=np.abs(intrinsic)
             intrinsic_matrix=np.zeros((4,4))
             intrinsic_matrix[0:3,0:3]=intrinsic
             intrinsic_matrix[3,3]=1
 
-            inside_path=os.path.join(self.occ_path,render_id,"outside_points.obj")
-            outside_path=os.path.join(self.occ_path,render_id,"inside_points.obj")
-            if os.path.isfile(inside_path)==False or os.path.isfile(outside_path)==False:
-                print(inside_path)
-                continue
-            inside_samples=read_obj_point(inside_path)
-            outside_samples=read_obj_point(outside_path)
-            if inside_samples.shape[0]<2500 or outside_samples.shape[0]<2500:
-                continue
+            if self.load_dynamic==True:
+                inside_path=os.path.join(self.occ_path,render_id,"outside_points.obj")
+                outside_path=os.path.join(self.occ_path,render_id,"inside_points.obj")
+                if os.path.isfile(inside_path)==False or os.path.isfile(outside_path)==False:
+                    print(inside_path)
+                    continue
+                inside_samples=read_obj_point(inside_path)
+                outside_samples=read_obj_point(outside_path)
+                if inside_samples.shape[0]<2500 or outside_samples.shape[0]<2500:
+                    continue
+            else:
+                if render_id not in self.occ_outside_data_dict:
+                    continue
+                inside_samples=self.occ_outside_data_dict[render_id]
+                outside_samples=self.occ_inside_data_dict[render_id]
             inside_random_ind=np.random.choice(inside_samples.shape[0],2500,replace=False)
             outside_random_ind=np.random.choice(outside_samples.shape[0],2500,replace=False)
             sample_points=np.concatenate([inside_samples[inside_random_ind],outside_samples[outside_random_ind]],axis=0)

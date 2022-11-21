@@ -13,6 +13,7 @@ data:
   split_path: ./data/3dfront/bg_split
   occ_path: ./data/3dfront/bgocc
   batch_size: 12
+  load_dynamic: False
   num_workers: 12
   use_aug: True
   rotate_degree: 2.5
