@@ -151,28 +151,15 @@ class InstPIFu(BasePIFuNet):
         if labels is not None:
             self.labels = labels
 
-        #img_coor = torch.einsum("ijk,ikl->ijl", points, intrinsic[:,0:3,0:3].transpose(1, 2))
         x_coor = img_coor[:, :,0]
         y_coor = img_coor[:, :,1]
-        #z_coor = img_coor[:, :,2]
         '''
         p_project is B,7,NUM_SAM,2
         '''
         xy=torch.cat([x_coor[:,:,None],y_coor[:,:,None]],dim=2) #B,NUM_SAM,2
-        #xy = torch.cat([(x_coor[:, :, None] / 640.0 - 0.5) * 2, (y_coor[:, :, None] / 478 - 0.5) * 2],
-        #                      dim=-1).float()
-        self.in_img = (xy[:, :, 0] >= -1.0) & (xy[:, :, 0] <= 1.0) & (xy[:,:, 1] >= -1.0) & (xy[:,:, 1] <= 1.0)
-        #print(torch.sum(in_img)/in_img.shape[0]/in_img.shape[1])
-        z_feat=z_feat
-        #z_feat.requires_grad=True
         self.z_feat=z_feat
         '''extract global feature from feature map from hourglass network'''
         '''try it from the first layer'''
-        #print(self.im_feat_list[0].shape)
-        last_roi_feat=F.grid_sample(self.im_feat_list[0], bdb_grid, align_corners=True, mode='bilinear')
-        self.global_feat=self.global_encoder(last_roi_feat)
-        #print(self.global_feat.shape)
-        #print(self.global_feat.shape)
 
         if self.opt["model"]["skip_hourglass"]:
             tmpx_local_feature = self.index(self.tmpx, xy)
@@ -194,16 +181,20 @@ class InstPIFu(BasePIFuNet):
         self.intermediate_preds_list.append(global_pred)
         self.mask_list=[]
         self.channel_atten_list=[]
-        #if self.training==False:
-        #self.im_feat_list=[self.im_feat_list[-1]]
-        for im_feat in self.im_feat_list:
+        # if self.training==False:
+        #     self.im_feat_list=[self.im_feat_list[-1]]
+        if self.training:
+            input_im_feat=self.im_feat_list[0:-1]
+        else:
+            input_im_feat=self.im_feat_list[-2:-1]
+        for im_feat in input_im_feat:
             if self.config['model']['use_atten']:
                 ret_dict=self.post_op_module(im_feat,torch.cat([self.global_feat,cls_codes],dim=1),bdb_grid)
                 roi_feat=ret_dict["roi_feat"]
                 self.channel_atten_list.append(ret_dict['channel_atten_weight'])
             else:
                 roi_feat = F.grid_sample(im_feat, bdb_grid, align_corners=True, mode='bilinear')
-            if self.config['data']['use_instance_mask']:
+            if self.config['data']['use_instance_mask'] and self.training:
                 pred_mask=self.mask_decoder(roi_feat)
                 self.mask_list.append(pred_mask)
             if self.config['data']['use_positional_embedding']:
@@ -220,6 +211,7 @@ class InstPIFu(BasePIFuNet):
 
             pred=self.surface_classifier(point_local_feat)
             self.intermediate_preds_list.append(pred)
+        #print(len(self.intermediate_preds_list))
         self.preds = self.intermediate_preds_list[-1].squeeze(1)
 
 
@@ -275,7 +267,8 @@ class InstPIFu(BasePIFuNet):
 
         transforms = None
         self.filter(images,patch)
-
+        last_roi_feat = F.grid_sample(self.im_feat_list[0], bdb_grid, align_corners=True, mode='bilinear')
+        self.global_feat = self.global_encoder(last_roi_feat)
         # Phase 2: point query
         self.query(points=points, z_feat=z_feat,bdb_grid=bdb_grid,transforms=transforms,cls_codes=cls_codes, labels=labels,img_coor=img_coor)#,depth=depth)
 
@@ -330,6 +323,8 @@ class InstPIFu(BasePIFuNet):
         bdb_grid=data_dict['bdb_grid']
         transforms = None
         self.filter(whole_image, patch)
+        last_roi_feat = F.grid_sample(self.im_feat_list[0], bdb_grid, align_corners=True, mode='bilinear')
+        self.global_feat = self.global_encoder(last_roi_feat)
 
         x_coor = torch.linspace(-1.2, 1.2, steps=marching_cube_resolution).float().to(image.device)
         y_coor = torch.linspace(-1.2, 1.2, steps=marching_cube_resolution).float().to(image.device)
