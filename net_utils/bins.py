@@ -50,3 +50,8 @@ with open(mean_size_path,'rb') as f:
         avg_size[label_id]=content[key]
 #print(avg_size)
 bin['avg_size'] = np.vstack([avg_size[key] for key in range(len(avg_size))])
+
+mean_layout_path="./data/3dfront/avg_layout.pkl"
+f=open(mean_layout_path,'rb')
+avg_layout=p.load(f)
+f.close()
