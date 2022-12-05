@@ -67,6 +67,10 @@ run the following commands to train background reconstruction:
 ```angular2html
 python main.py --mode train --config ./configs/train_bg_PIFu.yaml
 ```
+run the following commands to extract background mesh:
+```angular2html
+python main.py --mode test --config ./configs/test_bg_PIFu.yaml
+```
 
 # To Do
 - [x] Codes for background reconstruction
