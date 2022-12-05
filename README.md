@@ -67,11 +67,12 @@ run the following commands to train background reconstruction:
 ```angular2html
 python main.py --mode train --config ./configs/train_bg_PIFu.yaml
 ```
-This part is still under testing.
 
 # To Do
 - [x] Codes for background reconstruction
+- [ ] Evaluation for background reconstruction
 - [ ] Codes for 3D object detection
+- [ ] Train and test on pix3d dataset
 # Citation
 If you find our work useful, please cite
 ```angular2
