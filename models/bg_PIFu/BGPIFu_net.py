@@ -222,18 +222,21 @@ class BGPIFu_Net(BasePIFuNet):
         self.filter(image)
         volumn = torch.ones((marching_cube_resolution, marching_cube_resolution, marching_cube_resolution)).float().to(
             image.device)
-        x_coor = torch.linspace(-3, 3, steps=marching_cube_resolution).float()
-        y_coor = torch.linspace(-2, 2, steps=marching_cube_resolution).float()
-        z_coor = torch.linspace(1, 10, steps=marching_cube_resolution).float()
+        x_coor = torch.linspace(-3, 3, steps=marching_cube_resolution).float().cuda()
+        y_coor = torch.linspace(-2, 2, steps=marching_cube_resolution).float().cuda()
+        z_coor = torch.linspace(1, 10, steps=marching_cube_resolution).float().cuda()
         X, Y, Z = torch.meshgrid(x_coor, y_coor, z_coor)
         samples_incam = torch.cat([X[:, :, :, None], Y[:, :, :, None], Z[:, :, :, None]], dim=3).unsqueeze(0)
         samples_incam=samples_incam.reshape(samples_incam.shape[0],-1,3)
 
-        project_sample = torch.einsum("ijk,ikq->ijq", samples_incam, data_dict["intrinsic"][:, 0:3, 0:3].transpose(1, 2).cpu())
+        #print(samples_incam.shape,K.shape)
+        project_sample = torch.einsum("ijk,ikq->ijq", samples_incam, data_dict["intrinsic"][:, 0:3, 0:3].transpose(1, 2))
         project_x = project_sample[:, :, 0] / project_sample[:, :, 2]
         project_y = project_sample[:, :, 1] / project_sample[:, :, 2]
         visible_ind = torch.where(
             (project_x <= width-1) & (project_x > 0) & (project_y > 0) & (project_y <= height-1) & (project_sample[:, :, 2] > 0))
+        # print(samples_incam.shape,visible_ind[0].shape,visible_ind[1].reshape)
+        #print(torch.max(visible_ind[0]))
         visible_sample=samples_incam[visible_ind[0],visible_ind[1],:].unsqueeze(0)
         sample_list=torch.split(visible_sample,200000,dim=1)
         #print(visible_sample.shape,K.shape)

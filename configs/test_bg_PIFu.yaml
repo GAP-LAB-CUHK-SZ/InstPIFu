@@ -1,37 +1,27 @@
-resume: False
-weight: ./checkpoints/instPIFu_0829/model_latest.pth
+resume: True
+weight: ./checkpoints/bgPIFu/model_best.pth
 finetune: False
 method: bgPIFu
-exp_name: bgPIFu
+exp_name: bgPIFu_result
 phase: reconstruction
 device:
   use_gpu: True
-  gpu_ids: '6,7'
+  gpu_ids: '3'
 data:
   dataset: front3d_bg
   data_path: ./data/3dfront/prepare_data
   split_path: ./data/3dfront/bg_split
   occ_path: ./data/3dfront/bgocc
-  batch_size: 12
-  load_dynamic: False
-  num_workers: 12
+  batch_size: 1
+  load_dynamic: True
+  num_workers: 1
   use_aug: True
   rotate_degree: 2.5
   image_height: 200
   image_width: 268
   use_positional_embedding: True
   multires: 4
-optimizer:
-  type: Adam
-  lr: 0.0001
-  beta1: 0.9
-  beta2: 0.999
-  eps:
-  weight_decay:
-scheduler:
-  type: MultiStepLR
-  milestone: [50,80]
-  gamma: 0.2
+  marching_cube_resolution: 256
 model:
   mlp_dim: [1283, 1024, 512, 256, 128, 1]
   no_residual: False

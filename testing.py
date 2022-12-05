@@ -35,3 +35,8 @@ def Recon_tester(cfg,model,loader,device,checkpoint):
             #print(m_save_path,data_batch['jid'][0])
             print("saving to %s"%(m_save_path))
             mesh.export(m_save_path)
+        elif config['method']=="bgPIFu":
+            taskid = data_batch['taskid'][0]
+            m_save_path = os.path.join(log_dir, taskid + ".ply")
+            print("saving to %s" % (m_save_path))
+            mesh.export(m_save_path)

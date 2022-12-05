@@ -205,6 +205,8 @@ class FRONT_bg_dataset(Dataset):
                     continue
                 inside_samples=self.occ_outside_data_dict[render_id]
                 outside_samples=self.occ_inside_data_dict[render_id]
+                if inside_samples.shape[0]<2500 or outside_samples.shape[0]<2500:
+                    continue
             inside_random_ind=np.random.choice(inside_samples.shape[0],2500,replace=False)
             outside_random_ind=np.random.choice(outside_samples.shape[0],2500,replace=False)
             sample_points=np.concatenate([inside_samples[inside_random_ind],outside_samples[outside_random_ind]],axis=0)

@@ -371,7 +371,7 @@ def get_trainer(config):
     return trainer
 
 def get_tester(config):
-    if config['method']=="instPIFu":
+    if config['method']=="instPIFu" or config['method']=="bgPIFu":
         from testing import Recon_tester
         tester=Recon_tester
     else:
