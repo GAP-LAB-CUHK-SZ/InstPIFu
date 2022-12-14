@@ -1,5 +1,5 @@
 resume: False
-weight: ./checkpoints/instPIFu/model_latest.pth
+weight: ./checkpoints/instPIFu_0830/model_latest.pth
 finetune: False
 method: instPIFu
 exp_name: instPIFu

@@ -2,12 +2,12 @@ resume: True
 weight: ./checkpoints/instPIFu_0830/model_best.pth
 finetune: False
 method: instPIFu
-exp_name: instPIFu_0830_2_recon_result
+exp_name: instPIFu_result
 phase: reconstruction
 debug: True
 device:
   use_gpu: True
-  gpu_ids: '7'
+  gpu_ids: '2'
 data:
   dataset: front3d_recon
   data_path: ./data/3dfront/prepare_data

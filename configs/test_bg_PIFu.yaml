@@ -2,7 +2,7 @@ resume: True
 weight: ./checkpoints/bgPIFu/model_best.pth
 finetune: False
 method: bgPIFu
-exp_name: bgPIFu_result
+exp_name: bgPIFu_result_1205
 phase: reconstruction
 device:
   use_gpu: True
