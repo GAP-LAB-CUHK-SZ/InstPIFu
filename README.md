@@ -21,8 +21,7 @@ pip install -r requirements.txt
 The prepare data for training is in the following link: <a href="https://cuhko365-my.sharepoint.com/:f:/g/personal/115010192_link_cuhk_edu_cn/Eg99g4P1VMVJoZ5fz3lmDkABvj7Gc7yCjq-qBuYNqWjl2w?e=72lix4" target="__blank">training_data</a>.
 Download prepare_data.zip, occ.zip, mask.zip, and unzip them under ./data/3dfront. 
 # Code
-Codes for single-view object reconstruction is already released.
-The codes for 3D object detection and backgrounding reconstruction will be updated in a few days.
+Visualization code will be released in a few days.
 
 ## Object Reconstruction
 ### Training
