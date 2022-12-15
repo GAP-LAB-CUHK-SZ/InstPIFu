@@ -81,7 +81,7 @@ python evaluate_bg.py --gt_dir ./data/3dfront/bgdepth --result_dir ./checkpoints
 
 ## Object detection
 Our object detection is based on <a href="https://github.com/chengzhag/Implicit3DUnderstanding" target="__blank">Im3D</a>. There are three stages for training. I release 
-the pretrained weight on 3D-Front dataset in <a href="https://cuhko365-my.sharepoint.com/:u:/g/personal/115010192_link_cuhk_edu_cn/EUCaLPeAr_9HhX05X6VMB30BEiK-mp4GKl1tmTJMOQL1ng?e=1CkqRW" target="__blank">model_best_det.pth</a>.
+the pretrained weight on 3D-Front dataset in <a href="https://cuhko365-my.sharepoint.com/:u:/g/personal/115010192_link_cuhk_edu_cn/EV9gH5NBUApGsmFkDXNHSR0BdCB7wqDRMc_s8Za0C9FpJQ?e=HpBaxn" target="__blank">model_best_det.pth</a>.
 It is recommended to use this pretrained weight to generate 3D bounding box and camera pose estimation.
 You can download the pretrained weight, and put it under ./checkpoints/det_weight.
 Testing is conducted by running the following commands:
