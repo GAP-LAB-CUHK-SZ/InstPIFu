@@ -1,0 +1,87 @@
+resume: True
+finetune: False
+method: det
+weight: ['./checkpoints/det_weight/model_best_det.pth']
+exp_name: detection_result
+isTrain: True
+phase: joint
+device:
+  use_gpu: True
+  gpu_ids: '5'
+data:
+  dataset: front3d_det
+  data_path: ./data/3dfront/prepare_data
+  batch_size: 12
+  num_workers: 8
+  use_aug: False
+  rotate_degree: 2.5
+  use_depth: True
+  use_normal: False
+  image_height: 200
+  image_width: 268
+loss_weights:
+  size_reg_loss: 1.0
+  ori_cls_loss: 0.33
+  ori_reg_loss: 1.0
+  centroid_cls_loss: 0.75
+  centroid_reg_loss: 0.5
+  offset_2D_loss: 0.5
+  pitch_cls_loss: 0.25
+  pitch_reg_loss: 1.0
+  roll_cls_loss: 0.25
+  roll_reg_loss: 0.5
+  lo_ori_cls_loss: 0.25
+  lo_ori_reg_loss: 0.75
+  lo_centroid_loss: 1.0
+  lo_coeffs_loss: 1.0
+  lo_corner_loss: 1.0
+  phy_loss: 0.75
+  bdb2D_loss: 0.75
+  corner_loss: 0.75
+  ldif_phy_loss: 20.0
+model:
+  hidden_dim: 256
+  displacement: 0.15
+  max_dist: 0.5
+  resnet_layers: 32
+  depth_estimation: False
+  use_global: True
+  bottleneck_size: 1536
+  element_count: 32
+  sym_element_count: 16
+  implicit_parameter_length: 32
+  uniform_loss_weight: 1.0
+  near_surface_loss_weight: 0.1
+  lowres_grid_inside_loss_weight: 0.2
+  inside_box_loss_weight: 10.0
+  loss_settings:
+    scale_before_func: 100.0
+    phy_loss_samples: 128
+    phy_loss_objects: 4
+    surface_optimize: True
+    type: classmse
+  output_adjust:
+    method: GCNN
+    loss: Null
+    feature_dim: 512
+    feat_update_step: 4
+    res_output: True
+    lo_features: ['pitch_reg_result', 'roll_reg_result', 'pitch_cls_result',
+                  'roll_cls_result',
+                  'lo_centroid_result', 'lo_coeffs_result', 'lo_afeatures', 'K']
+    obj_features: ['size_cls', 'cls_codes', 'size_reg_result', 'ori_reg_result', 'ori_cls_result',
+                   'centroid_reg_result', 'centroid_cls_result', 'offset_2D_result',
+                   'analytic_code', 'odn_arfeatures', 'blob_center']
+    rel_features: ['g_features', 'bdb2D_pos']
+other:
+  nepoch: 30
+  model_save_interval: 1
+  model_save_dir: ./checkpoints
+  visualize_interval: 1000
+  dump_result: True
+  dump_interval: 1000
+train:
+  epochs: 30
+  phase: 'joint' # 'layout_estimation' or 'object_detection' or 'joint'.
+  freeze: ['mesh_reconstruction']
+  batch_size: 2

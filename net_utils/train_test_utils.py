@@ -347,6 +347,9 @@ def get_model(cfg,device):
     elif cfg['method']=="bgPIFu":
         from models.bg_PIFu.BGPIFu_net import BGPIFu_Net
         model=BGPIFu_Net(cfg).to(device)
+    elif cfg['method']=="det":
+        from models.detection.network import TOTAL3D
+        model=TOTAL3D(cfg).to(device)
     else:
         raise NotImplementedError
     return model
@@ -358,6 +361,9 @@ def get_dataloader(cfg,mode):
     elif cfg['data']['dataset']=="front3d_bg":
         from dataset.front3d_bg_dataset import Front3D_bg_Dataloader
         dataloader=Front3D_bg_Dataloader(cfg,mode)
+    elif cfg['data']['dataset']=="front3d_det":
+        from dataset.front3d_detect_dataset import Front_det_dataloader
+        dataloader=Front_det_dataloader(cfg,mode)
     else:
         raise NotImplementedError
     return dataloader
@@ -374,6 +380,9 @@ def get_tester(config):
     if config['method']=="instPIFu" or config['method']=="bgPIFu":
         from testing import Recon_tester
         tester=Recon_tester
+    elif config['method']=="det":
+        from testing import Det_tester
+        tester=Det_tester
     else:
         raise NotImplementedError
     return tester

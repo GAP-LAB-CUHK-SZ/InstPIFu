@@ -55,3 +55,7 @@ mean_layout_path="./data/3dfront/avg_layout.pkl"
 f=open(mean_layout_path,'rb')
 avg_layout=p.load(f)
 f.close()
+
+bins_tensor={}
+for key in bin:
+    bins_tensor[key]=torch.tensor(bin[key]).float().cuda()

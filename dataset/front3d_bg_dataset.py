@@ -97,6 +97,8 @@ class FRONT_bg_dataset(Dataset):
             self.split=json.load(f)
         self.load_dynamic=self.config['data']['load_dynamic']
         #self.split=self.split[0:100]
+        if mode=="test":
+            self.split=self.split[0:2000]
         if self.load_dynamic==False:
             self.__load_data()
         # self.__load_data()
