@@ -12,6 +12,8 @@ import shutil
 import subprocess
 from net_utils.bins import *
 from external.pyTorchChamferDistance.chamfer_distance import ChamferDistance
+import scipy
+
 dist_chamfer=ChamferDistance()
 
 category_label_mapping = {0:"table",
@@ -30,7 +32,7 @@ def parse_args():
     parser = argparse.ArgumentParser('totalindoorrecon evaluation')
     parser.add_argument('--result_dir', type=str,
                         help='folder contains the results of object mesh')
-    parser.add_argument('--gt_dir',type=str,default="/data3/haolin/data/3D-FUTURE-watertight-test/",help="folder containing the watertight ground truth mesh")
+    parser.add_argument('--gt_dir',type=str,default="/data3/haolin/data/3D-FUTURE-watertight/",help="folder containing the watertight ground truth mesh")
     return parser.parse_args()
 
 def delete_disconnected_component(mesh):
@@ -47,8 +49,28 @@ def delete_disconnected_component(mesh):
     # print(max_vertice)
     return split_mesh[max_ind]
 
+OCCNET_FSCORE_EPS = 1e-09
+
+def percent_below(dists, thresh):
+  return np.mean((dists**2 <= thresh).astype(np.float32)) * 100.0
+
+def f_score(a_to_b, b_to_a, thresh):
+  precision = percent_below(a_to_b, thresh)
+  recall = percent_below(b_to_a, thresh)
+
+  return (2 * precision * recall) / (precision + recall + OCCNET_FSCORE_EPS)
+def pointcloud_neighbor_distances_indices(source_points, target_points):
+  target_kdtree = scipy.spatial.cKDTree(target_points)
+  distances, indices = target_kdtree.query(source_points, n_jobs=-1)
+  return distances, indices
+def fscore(points1,points2,tau=0.002):
+  """Computes the F-Score at tau between two meshes."""
+  dist12, _ = pointcloud_neighbor_distances_indices(points1, points2)
+  dist21, _ = pointcloud_neighbor_distances_indices(points2, points1)
+  f_score_tau = f_score(dist12, dist21, tau)
+  return f_score_tau
+
 args=parse_args()
-chamfer_distance_list=[]
 result_list=glob.glob(args.result_dir+"/*.ply")
 prepare_data_dir="./data/3dfront/prepare_data/test"
 gt_dir=args.gt_dir
@@ -68,8 +90,10 @@ def get_rot_from_yaw(yaw):
                      [-sy,0,cy]])
     return rot
 
+chamfer_distance_list=[]
 cd_loss_dict={}
-
+fscore_list=[]
+fst_dict={}
 #select_class_list=["bed"]
 log_txt=os.path.join(args.result_dir,"evaluate_log.txt")
 for (taskid,object_id) in select_split_list:
@@ -95,6 +119,7 @@ for (taskid,object_id) in select_split_list:
     #    continue
     if classname not in cd_loss_dict:
         cd_loss_dict[classname]=[]
+        fst_dict[classname]=[]
 
     jid=prepare_data['boxes']['jid'][int(object_id)]
     tran_matrix=prepare_data['boxes']['tran_matrix'][int(object_id)]
@@ -146,6 +171,12 @@ for (taskid,object_id) in select_split_list:
 
     pred_sample_points=align_mesh.sample(10000)
     gt_sample_points=gt_mesh.sample(10000)
+
+    fst=fscore(pred_sample_points,gt_sample_points)
+    fst_dict[classname].append(fst)
+    fscore_list.append(fst)
+
+
     pred_sample_gpu=torch.from_numpy(pred_sample_points).float().cuda().unsqueeze(0)
     gt_sample_gpu=torch.from_numpy(gt_sample_points).float().cuda().unsqueeze(0)
     #print(pred_sample_gpu.shape,gt_sample_gpu.shape)
@@ -154,7 +185,8 @@ for (taskid,object_id) in select_split_list:
     cd_loss=torch.mean(dist1)+torch.mean(dist2)
     cd_loss_dict[classname].append(cd_loss.item())
     chamfer_distance_list.append(cd_loss.item())
-    msg="processing %s ,class %s, cd loss: %f,mean cd_loss: %f" % (result_file,classname,cd_loss.item(),np.mean(np.array(chamfer_distance_list)))
+    msg="processing %s ,class %s, cd loss: %f,mean cd_loss: %f, fscore: %f, mean fscore: %f" %(
+        result_file,classname,cd_loss.item(),np.mean(np.array(chamfer_distance_list)),fst,np.mean(np.array(fscore_list)))
     print(msg)
     with open(log_txt,'a') as f:
         f.write(msg+"\n")
@@ -171,5 +203,10 @@ for key in cd_loss_dict:
     print(msg)
     with open(log_txt, 'a') as f:
         f.write(msg + "\n")
+for key in fst_dict:
+    msg="fscore of category %s is %f"%(key,fst_dict[key])
+    print(msg)
+    with open(log_txt,'a') as f:
+        f.write(msg+"\n")
 
 
