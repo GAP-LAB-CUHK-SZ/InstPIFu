@@ -194,7 +194,7 @@ class InstPIFu(BasePIFuNet):
                 self.channel_atten_list.append(ret_dict['channel_atten_weight'])
             else:
                 roi_feat = F.grid_sample(im_feat, bdb_grid, align_corners=True, mode='bilinear')
-            if self.config['data']['use_instance_mask'] and self.training:
+            if self.config['data']['use_instance_mask']:
                 pred_mask=self.mask_decoder(roi_feat)
                 self.mask_list.append(pred_mask)
             if self.config['data']['use_positional_embedding']:

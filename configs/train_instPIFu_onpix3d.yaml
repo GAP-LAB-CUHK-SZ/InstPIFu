@@ -1,0 +1,56 @@
+resume: False
+weight: ./checkpoints/instPIFu_0830/model_latest.pth
+finetune: False
+method: instPIFu
+exp_name: instPIFu_pix3d
+phase: reconstruction
+device:
+  use_gpu: True
+  gpu_ids: '4'
+data:
+  dataset: pix3d_recon
+  data_path: ./data/pix3d/train_test_data
+  split_dir: ./data/pix3d/splits
+  occ_path: ./data/pix3d/occ
+  base_dir: ./data/pix3d
+  mesh_dir: ./data/pix3d/model
+  distributed: True
+  batch_size: 8
+  num_workers: 8
+  use_aug: True
+  use_positional_embedding: True
+  use_instance_mask: True
+  use_crop: True
+optimizer:
+  type: Adam
+  lr: 0.0001
+  beta1: 0.9
+  beta2: 0.999
+  eps:
+  weight_decay:
+scheduler:
+  type: MultiStepLR
+  milestone: [50,80]
+  gamma: 0.2
+model:
+  mlp_dim: [549, 1024, 512, 256, 128, 1]
+  no_residual: False
+  num_stack: 4
+  norm: group
+  hg_down: ave_pool
+  num_hourglass: 2
+  hourglass_dim: 256
+  skip_hourglass: False
+  multires: 4
+  use_atten: True
+  global_recon: True
+  global_mlp_dim: [293,512,256,128,1]
+other:
+  nepoch: 100
+  model_save_interval: 1
+  model_save_dir: ./checkpoints
+  visualize_interval: 1000
+  dump_result: True
+  dump_interval: 1000
+
+

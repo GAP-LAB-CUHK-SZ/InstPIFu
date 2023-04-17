@@ -198,6 +198,8 @@ with open(log_txt, 'a') as f:
     f.write(msg + "\n")
 for key in cd_loss_dict:
     cd_loss_dict[key]=np.mean(np.array(cd_loss_dict[key]))
+for key in fst_dict:
+    fst_dict[key]=np.mean(np.array(fst_dict[key]))
 for key in cd_loss_dict:
     msg="cd loss of category %s is %f"%(key,cd_loss_dict[key])
     print(msg)
