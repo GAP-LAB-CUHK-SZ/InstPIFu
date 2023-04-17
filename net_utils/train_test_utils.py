@@ -364,6 +364,9 @@ def get_dataloader(cfg,mode):
     elif cfg['data']['dataset']=="front3d_det":
         from dataset.front3d_detect_dataset import Front_det_dataloader
         dataloader=Front_det_dataloader(cfg,mode)
+    elif cfg['data']['dataset']=="pix3d_recon":
+        from dataset.pix3d_recon_dataset import Pix3D_Recon_dataloader
+        dataloader=Pix3D_Recon_dataloader(cfg,mode)
     else:
         raise NotImplementedError
     return dataloader
