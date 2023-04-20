@@ -87,7 +87,7 @@ def read_obj_point(obj_path):
         return np.array(point_list)
 
 class FRONT_bg_dataset(Dataset):
-    def __init__(self,config,mode):
+    def __init__(self,config,mode,testid=None):
         super(FRONT_bg_dataset,self).__init__()
         self.config=config
         self.mode=mode
@@ -97,8 +97,15 @@ class FRONT_bg_dataset(Dataset):
             self.split=json.load(f)
         self.load_dynamic=self.config['data']['load_dynamic']
         #self.split=self.split[0:100]
-        if mode=="test":
+        if (mode=="test") and (testid==None):
             self.split=self.split[0:2000]
+        if testid is not None:
+            new_split=[]
+            for item in self.split:
+                renderid=item[0]
+                if renderid==testid:
+                    new_split.append(item)
+            self.split=new_split
         if self.load_dynamic==False:
             self.__load_data()
         # self.__load_data()

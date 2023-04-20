@@ -11,7 +11,7 @@ device:
 data:
   dataset: front3d_recon
   data_path: ./data/3dfront/prepare_data
-  split_dir: ./data/3dfront/split-filter
+  split_dir: ./data/3dfront/split
   occ_path: ./data/3dfront/occ
   mask_path: ./data/3dfront/mask
   #class_name: ['chair','table','sofa','cabinet','night_stand','bookshelf','bed','desk','dresser']

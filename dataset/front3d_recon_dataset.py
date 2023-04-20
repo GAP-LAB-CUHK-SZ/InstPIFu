@@ -101,7 +101,7 @@ data_transforms_mask = transforms.Compose([
 ])
 
 class Front3D_Recon_Dataset(Dataset):
-    def __init__(self, config, mode):
+    def __init__(self, config, mode, testid=None):
         super(Front3D_Recon_Dataset, self).__init__()
         self.mode = mode
         self.config = config
@@ -123,17 +123,27 @@ class Front3D_Recon_Dataset(Dataset):
             self.split_path = os.path.join(self.config['data']['split_dir'], mode, classname + ".json")
             with open(self.split_path, 'r') as f:
                 self.split = json.load(f)
+        #print(self.split_path)
         #print(len(self.split))
         #print(self.split)
         '''only test 2000 samples'''
-        if mode=="test":
+        if (mode=="test") and (testid is None):
             self.split=self.split[0:2000]
-
+        #print(self.split[0:10])
         for i in range(len(self.split)):
             filename=self.split[i][0]
             if ".pkl" in filename:
                 taskid=filename.rstrip(".pkl")
+            else:
+                taskid=filename
             self.split[i][0]=taskid
+        if testid is not None:
+            self.new_split = []
+            for i in range(len(self.split)):
+                taskid = self.split[i][0]
+                if testid==taskid:
+                    self.new_split.append(self.split[i])
+            self.split=self.new_split
 
         if self.config['data']['load_dynamic'] == False:
             self.__load_data()
