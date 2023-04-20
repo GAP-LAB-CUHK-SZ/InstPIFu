@@ -116,6 +116,13 @@ python main.py --mode train --config ./configs/inference_object_detection.yaml
 ### testing object reconstrution with predicted pose
 you can update the entry use_pred_pose, and pred_pose_path (path storing the object detection result) in test_instPIFu.yaml to use the predicted pose during mesh reconstruction.
 
+## Demo
+Visualization results can be obtained by running:
+```angular2html
+python demo.py --taskid rendertaskxxxx
+```
+The results will be saved into ./output/rendertaskxxx/*.ply
+
 # To Do
 - [x] Codes for background reconstruction
 - [x] Evaluation for background reconstruction
