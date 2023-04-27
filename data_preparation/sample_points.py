@@ -3,6 +3,7 @@ import numpy as np
 import os
 import random
 import argparse
+from tqdm import tqdm
 
 def save_obj_mesh(mesh_path, verts, faces):
     file = open(mesh_path, 'w')
@@ -31,9 +32,6 @@ def get_minmax(vertices, B_MIN, B_MAX):
     B_MAX[2] = bmax_z * 1.1
 
 
-data_root = '/data/haolin/3D-FUTURE-watertight/'
-target_root = '/data/haolin/3D-FUTURE-occ-sampling_1106/'
-
 def run(data_root,target_root):
     num_sample_inout = 30000
     sigma = 5.0  # perturbation standard deviation for positions
@@ -50,9 +48,11 @@ def run(data_root,target_root):
     failed_subj = []
     few_inside = []
 
-    for i, subject in enumerate(subjects[:]):
+    for i, subject in tqdm(enumerate(subjects[:])):
         try:
-            mesh = trimesh.load(os.path.join(data_root, subject, 'raw_watertight.obj'))
+            mesh_path=os.path.join(data_root, subject, 'raw_watertight.obj')
+            print(os.path.exists(mesh_path))
+            mesh = trimesh.load(mesh_path)
             vertices = np.array(mesh.vertices)
             get_minmax(vertices, B_MIN, B_MAX)
             #print(B_MIN, B_MAX)
@@ -63,35 +63,31 @@ def run(data_root,target_root):
             sample_points = surface_points + 0.01 * np.random.normal(scale=sigma, size=surface_points.shape)
 
             # add random points within image space
-            length = B_MAX - B_MIN
-            scale = max(length) / 2.0
-            random_points = np.random.rand(num_sample_inout * 2, 3) * length + B_MIN
-            # B_MIN = (B_MAX + B_MIN)/2 - np.array([mc_box_size/2*scale, mc_box_size/2*scale, mc_box_size/2*scale])
-            # random_points = np.random.rand(num_sample_inout * 2, 3) * np.array([mc_box_size *scale, mc_box_size *scale, mc_box_size *scale]) + B_MIN
-            # sample_points = np.concatenate([sample_points, random_points], 0)
+            b_min=np.amin(B_MIN)
+            b_max=np.amax(B_MAX)
+            length = b_max - b_min
+            scale = length
+            random_points = np.random.rand(num_sample_inout * 2, 3) * length + b_min
             np.random.shuffle(sample_points)
 
             # labeling
             uniform_inside = mesh.contains(random_points)
             uniform_inside_points = random_points[uniform_inside]
             uniform_outside_points = random_points[np.logical_not(uniform_inside)]
-
-            # save random samples
-            if not os.path.exists(os.path.join(target_root, subject)):
-                os.makedirs(os.path.join(target_root, subject))
-            #print(os.path.join(target_root, subject))
-            save_obj_mesh(os.path.join(target_root, subject, 'uniform_inside_points.obj'), uniform_inside_points, [])
-            save_obj_mesh(os.path.join(target_root, subject, 'uniform_outside_points.obj'), uniform_outside_points, [])
-
+            print(uniform_inside.shape)
             nss_inside = mesh.contains(sample_points)
+            print(nss_inside.shape)
             nss_inside_points = sample_points[nss_inside]
             nss_outside_points = sample_points[np.logical_not(nss_inside)]
 
             if not os.path.exists(os.path.join(target_root, subject)):
                 os.makedirs(os.path.join(target_root, subject))
             #print(os.path.join(target_root, subject))
-            save_obj_mesh(os.path.join(target_root, subject, 'nss_inside_points.obj'), nss_inside_points, [])
-            save_obj_mesh(os.path.join(target_root, subject, 'nss_outside_points.obj'), nss_outside_points, [])
+            inside_points=np.concatenate([uniform_inside_points,nss_inside_points],axis=0)
+            outside_points=np.concatenate([uniform_outside_points,nss_outside_points],axis=0)
+            print(inside_points.shape,outside_points.shape)
+            save_obj_mesh(os.path.join(target_root, subject, 'inside_points.obj'), inside_points, [])
+            save_obj_mesh(os.path.join(target_root, subject, 'outside_points.obj'), outside_points, [])
 
             print('Finished %d of %d models' % (i + 1, len(subjects)))
             print('failed %d' % len(failed_subj))

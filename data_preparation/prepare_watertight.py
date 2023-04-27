@@ -24,7 +24,8 @@ def run(future_root,save_root,Manifold_path):
         if os.path.exists(save_folder)==False:
             os.makedirs(save_folder)
         watertight_path=os.path.join(save_folder,"raw_watertight.obj")
-        pool.apply_async(make_watertight,args=(model_path,watertight_path,Manifold_path))
+        make_watertight(model_path,watertight_path,Manifold_path)
+        #pool.apply_async(make_watertight,args=(model_path,watertight_path,Manifold_path))
         #make_watertight(model_path,save_path)
     pool.close()
     pool.join()
