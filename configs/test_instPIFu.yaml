@@ -46,5 +46,6 @@ other:
   model_save_dir: ./checkpoints
   dump_result: True
   dump_interval: 1000
+  scale_back: False
 
 
