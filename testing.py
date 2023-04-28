@@ -3,6 +3,7 @@ import os
 import datetime
 import time
 import pickle
+import numpy as np
 
 def Recon_tester(cfg,model,loader,device,checkpoint):
     start_t = time.time()
@@ -21,7 +22,14 @@ def Recon_tester(cfg,model,loader,device,checkpoint):
             if isinstance(data_batch[key], list) == False:
                 data_batch[key] = data_batch[key].float().cuda()
         with torch.no_grad():
+            #print(data_batch['sequence_id'])
             mesh=model.extract_mesh(data_batch,config['data']['marching_cube_resolution'])
+            if config['other']['scale_back']:
+                bbox_size = data_batch["bbox_size"][0].cpu().numpy()
+                '''transform mesh to camera coordinate'''
+                obj_vert = np.asarray(mesh.vertices)
+                obj_vert = obj_vert / 2 * bbox_size
+                mesh.vertices = np.asarray(obj_vert.copy())
         msg = "{:0>8},[{}/{}]".format(
             str(datetime.timedelta(seconds=round(time.time() - start_t))),
             batch_id + 1,
