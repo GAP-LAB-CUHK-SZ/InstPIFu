@@ -2,15 +2,15 @@ resume: False
 weight: ./checkpoints/instPIFu_0830/model_latest.pth
 finetune: False
 method: instPIFu
-exp_name: instPIFu_pix3d
+exp_name: instPIFu_pix3d_0427
 phase: reconstruction
 device:
   use_gpu: True
-  gpu_ids: '4'
+  gpu_ids: '2'
 data:
   dataset: pix3d_recon
   data_path: ./data/pix3d/train_test_data
-  split_dir: ./data/pix3d/splits
+  split_dir: ./data/pix3d/splits_nonoverlap
   occ_path: ./data/pix3d/occ
   base_dir: ./data/pix3d
   mesh_dir: ./data/pix3d/model

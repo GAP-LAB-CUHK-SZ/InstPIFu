@@ -1,33 +1,27 @@
 resume: True
-weight: ./checkpoints/instPIFu_0830/model_best.pth
+weight: ./checkpoints/instPIFu_pix3d/model_best.pth
 finetune: False
 method: instPIFu
-exp_name: instPIFu_result
+exp_name: instPIFu_pix3d_result
 phase: reconstruction
 debug: True
 device:
   use_gpu: True
-  gpu_ids: '2'
+  gpu_ids: '6'
 data:
-  dataset: front3d_recon
-  data_path: ./data/3dfront/prepare_data
-  split_dir: ./data/3dfront/split
-  occ_path: ./data/3dfront/occ
-  mask_path: ./data/3dfront/mask
-  #class_name: ['chair','table','sofa','cabinet','night_stand','bookshelf','bed','desk','dresser']
-  class_name: all
-  test_class_name: all_subset
+  dataset: pix3d_recon
+  data_path: ./data/pix3d/train_test_data
+  split_dir: ./data/pix3d/splits_nonoverlap
+  occ_path: ./data/pix3d/occ
+  base_dir: ./data/pix3d
+  mesh_dir: ./data/pix3d/model
   distributed: True
-  load_dynamic: True
   batch_size: 1
   num_workers: 1
-  use_pred_pose: True
-  pred_pose_path: ./checkpoints/detection_result
-  use_aug: True
+  use_aug: False
   use_positional_embedding: True
   use_instance_mask: True
   use_crop: True
-  use_padding: False
   marching_cube_resolution: 256
 model:
   mlp_dim: [549, 1024, 512, 256, 128, 1]
@@ -43,7 +37,10 @@ model:
   global_recon: True
   global_mlp_dim: [293,512,256,128,1]
 other:
+  nepoch: 100
+  model_save_interval: 1
   model_save_dir: ./checkpoints
+  visualize_interval: 1000
   dump_result: True
   dump_interval: 1000
 

@@ -28,6 +28,7 @@ def parse_args():
 
 if __name__=="__main__":
     args=parse_args()
+    '''need to specify which weight files to load in the .yaml file'''
     instPIFu_config_path="./configs/test_instPIFu.yaml"
     bg_config_path="./configs/test_bg_PIFu.yaml"
 
@@ -48,16 +49,16 @@ if __name__=="__main__":
     inst_PIFu_dataset=Front3D_Recon_Dataset(instPIFu_config,"test",testid=args.testid)
     instPIFu_loader=dataset2dataloader(inst_PIFu_dataset)
 
-    bg_model=BGPIFu_Net(bg_config).cuda()
-    bg_checkpoints=torch.load(bg_config['weight'])
-    bg_net_weight=bg_checkpoints['net']
-    bg_new_net_weight={}
-    for key in bg_net_weight:
-        if key.startswith("module."):
-            k_=key[7:]
-            bg_new_net_weight[k_]=bg_net_weight[key]
-    bg_model.load_state_dict(bg_new_net_weight)
-    bg_model.eval()
+    # bg_model=BGPIFu_Net(bg_config).cuda()
+    # bg_checkpoints=torch.load(bg_config['weight'])
+    # bg_net_weight=bg_checkpoints['net']
+    # bg_new_net_weight={}
+    # for key in bg_net_weight:
+    #     if key.startswith("module."):
+    #         k_=key[7:]
+    #         bg_new_net_weight[k_]=bg_net_weight[key]
+    # bg_model.load_state_dict(bg_new_net_weight)
+    # bg_model.eval()
 
     bg_dataset=FRONT_bg_dataset(bg_config,"test",testid=args.testid)
     bg_loader=dataset2dataloader(bg_dataset)
@@ -99,6 +100,7 @@ if __name__=="__main__":
     save_path=os.path.join(save_folder,"input.jpg")
     print(save_path)
     cv2.imwrite(save_path,whole_image)
+    '''background inference will be added'''
     # '''inference background'''
     # for batch_id, data_batch in enumerate(bg_loader):
     #     for key in data_batch:

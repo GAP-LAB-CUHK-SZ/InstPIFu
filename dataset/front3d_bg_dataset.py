@@ -102,7 +102,7 @@ class FRONT_bg_dataset(Dataset):
         if testid is not None:
             new_split=[]
             for item in self.split:
-                renderid=item[0]
+                renderid=item['render_id']
                 if renderid==testid:
                     new_split.append(item)
             self.split=new_split

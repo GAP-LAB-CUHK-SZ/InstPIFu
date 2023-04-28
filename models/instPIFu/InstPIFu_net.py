@@ -314,7 +314,7 @@ class InstPIFu(BasePIFuNet):
         whole_image,image, cls_codes =data_dict["whole_image"],data_dict["image"],data_dict["cls_codes"]
         patch = data_dict["patch"]
         if self.config['data']['dataset']=='pix3d_recon':
-            K=data_dict['org_K']
+            K=data_dict['K']
         else:
             K=data_dict["K"]
         rot_matrix=data_dict["rot_matrix"]

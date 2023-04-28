@@ -262,6 +262,7 @@ class Pix3d_Recon_Dataset(Dataset):
             org_K=np.array([[f,0,width/2],
                             [0,f,height/2],
                             [0,0,1]])
+            '''adjust intrinsic considering image padding'''
             max_length = max(width, height)
             intrinsic=np.array([[f,0,max_length/2],
                                 [0,f,max_length/2],
@@ -277,8 +278,16 @@ class Pix3d_Recon_Dataset(Dataset):
             y_coor = y_coor / (bdb2D[3] - bdb2D[1]) * 2
             bdb_coor=np.concatenate([x_coor[:,np.newaxis],y_coor[:,np.newaxis]],axis=1)
 
-            bdb_x = np.linspace(bdb2D[0]+max(0,(height-width)/2), bdb2D[2]+max(0,(height-width)/2), 64)
-            bdb_y = np.linspace(bdb2D[1]+max(0,(width-height)/2), bdb2D[3]+max(0,(width-height)/2), 64)
+            '''consider padding'''
+            bdb2D_pad=bdb2D.copy()
+            bdb2D_pad[0]+=max(0,(height-width)/2)
+            bdb2D_pad[1]+=max(0,(width-height)/2)
+            bdb2D_pad[2]+=max(0,(height-width)/2)
+            bdb2D_pad[3]+=max(0,(width-height)/2)
+            #print(bdb2D_pad,bdb2D)
+
+            bdb_x = np.linspace(bdb2D_pad[0], bdb2D_pad[2], 64)
+            bdb_y = np.linspace(bdb2D_pad[1], bdb2D_pad[3], 64)
             bdb_X, bdb_Y = np.meshgrid(bdb_x, bdb_y)
             bdb_X = (bdb_X - max_length/2) / max_length*2
             bdb_Y = (bdb_Y - max_length/2) / max_length*2
@@ -348,7 +357,7 @@ class Pix3d_Recon_Dataset(Dataset):
         data_dict={
             "whole_image":pad_img.float(),"image":patch.float(),"patch":patch.float(),
             "samples":input_samples[:,0:3].astype(np.float32),
-            "inside_class":inside_class.astype(np.float32),"bdb2D_pos":bdb2D.astype(np.float32),
+            "inside_class":inside_class.astype(np.float32),"bdb2D_pos":bdb2D_pad.astype(np.float32),
             "sequence_id":taskid,"z_feat":z_feat,"K":intrinsic,"rot_matrix":rot_matrix,
             "jid":data['occ_inside'],"img_coor":bdb_coor.astype(np.float32),"taskid":taskid,"obj_id":"0",
             "obj_cam_center":obj_cam_center,"cls_codes":cls_codes.astype(np.float32),
@@ -380,6 +389,6 @@ if __name__=="__main__":
     for i in range(0,10):
         print("[%d/%d]"%(i,dataset.__len__()))
         item=dataset.__getitem__(i)
-        with open("/home/haolin/test_batch_%d.pkl"%(i),'wb') as f:
+        with open("/home/haolin/test_batch_%d_pix3d.pkl"%(i),'wb') as f:
             p.dump(item,f)
 
