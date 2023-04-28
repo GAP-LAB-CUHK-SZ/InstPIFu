@@ -1,5 +1,5 @@
 resume: True
-weight: ./checkpoints/instPIFu_pix3d/model_best.pth
+weight: ./checkpoints/instPIFu_pix3d_0427/model_best.pth
 finetune: False
 method: instPIFu
 exp_name: instPIFu_pix3d_result
