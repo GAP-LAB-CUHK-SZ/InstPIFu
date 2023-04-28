@@ -132,7 +132,7 @@ class Pix3d_Recon_Dataset(Dataset):
         self.split_path = os.path.join(self.config['data']['split_dir'], mode+".json")
         with open(self.split_path,'r') as f:
             self.split=json.load(f)
-        #self.split = self.split[0:100]
+        self.split = self.split[0:100]
         self.__load_data()
     def __len__(self):
         return len(self.split)
@@ -353,7 +353,7 @@ class Pix3d_Recon_Dataset(Dataset):
             cls_codes[category_label_mapping[category]]=1
             #print(category)
             success_flag=True
-        taskid=data['img'].split("/")[-2]+data['img'].split("/")[-1].split(".")[0]
+        #taskid=data['img'].split("/")[-2]+data['img'].split("/")[-1].split(".")[0]
         data_dict={
             "whole_image":pad_img.float(),"image":patch.float(),"patch":patch.float(),
             "samples":input_samples[:,0:3].astype(np.float32),
