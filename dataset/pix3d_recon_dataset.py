@@ -132,7 +132,7 @@ class Pix3d_Recon_Dataset(Dataset):
         self.split_path = os.path.join(self.config['data']['split_dir'], mode+".json")
         with open(self.split_path,'r') as f:
             self.split=json.load(f)
-        self.split = self.split[0:100]
+        #self.split = self.split[0:100]
         self.__load_data()
     def __len__(self):
         return len(self.split)
