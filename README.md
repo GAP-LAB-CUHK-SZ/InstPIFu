@@ -116,7 +116,7 @@ It is recommended to use this pretrained weight to generate 3D bounding box and 
 You can download the pretrained weight, and put it under ./checkpoints/det_weight.
 Testing is conducted by running the following commands:
 ```angular2html
-python main.py --mode train --config ./configs/inference_object_detection.yaml
+python main.py --mode test --config ./configs/inference_object_detection.yaml
 ```
 Detection results can be found in <a href="https://cuhko365-my.sharepoint.com/:u:/g/personal/115010192_link_cuhk_edu_cn/Ef44MzLaMwpClQ_wXXpzTAIBPzOkPZ8CLO89W4XFWIpMzw?e=J1DfNP" target="__blank">detection_result.zip</a>.
 Unzip the folder, and make sure to modify the pred_pose_path entry in test_instPIFu.yaml to use the detection results for object reconstruction.
