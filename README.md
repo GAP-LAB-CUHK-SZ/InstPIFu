@@ -37,7 +37,7 @@ Then, download <a href="https://cuhko365-my.sharepoint.com/:u:/g/personal/115010
 This folder will be used in the later script as layout_root. You can choose to generate your own layout for 3D-FRONT, but you will need to extract the depth image from the prepare_data.zip in the OneDrive Shared Folder, 
 the desc.json will be provided in <a href="https://cuhko365-my.sharepoint.com/:u:/g/personal/115010192_link_cuhk_edu_cn/EVmihvDBfmVBgR-bHWpDZIsBco3-0cYFRdEQLJlbJBLnGg?e=Z1DaYx" target="__blank">3d-front-object.zip</a>.
 ```angular2html
-python preprcess_layout.py --data_root <pathToFrontRawData> --save_root <PathToSave>
+python preprocess_layout.py --data_root <pathToFrontRawData> --save_root <PathToSave>
 ```
 And download <a href="https://cuhko365-my.sharepoint.com/:u:/g/personal/115010192_link_cuhk_edu_cn/EVmihvDBfmVBgR-bHWpDZIsBco3-0cYFRdEQLJlbJBLnGg?e=Z1DaYx" target="__blank">3d-front-object.zip</a>.
 This folder will be used in the later script as data_root.
@@ -124,11 +124,14 @@ Unzip the folder, and make sure to modify the pred_pose_path entry in test_instP
 you can update the entry use_pred_pose, and pred_pose_path (path storing the object detection result) in test_instPIFu.yaml to use the predicted pose during mesh reconstruction.
 
 ## Demo
-Visualization results can be obtained by running:
+Visualization results can be obtained by running, make sure to run the testid which exists in ./data/3dfront/split/test:
 ```angular2html
 python demo.py --taskid rendertaskxxxx
 ```
-The results will be saved into ./output/rendertaskxxx/*.ply
+The results will be saved into ./output/rendertaskxxx/*.ply.
+<br>
+visualization results will be similar as below(testid is rendertask6452):
+<p align="center"><img src="docs/visualize.png" width="500px"/></p></br>
 
 # To Do
 - [x] Codes for background reconstruction
