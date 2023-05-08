@@ -90,7 +90,7 @@ evaluation results on 3D-FUTURE:
 
 ## Background reconstruction
 ### training
-The occupancy data for background is already updated in <a href="https://cuhko365-my.sharepoint.com/:f:/g/personal/115010192_link_cuhk_edu_cn/Eg99g4P1VMVJoZ5fz3lmDkABvj7Gc7yCjq-qBuYNqWjl2w?e=72lix4" target="__blank">training_data</a>.
+The occupancy data for background is already updated in <a href="https://cuhko365-my.sharepoint.com/:u:/g/personal/115010192_link_cuhk_edu_cn/EZTSpAFPxLBFtK0wpwHr5gEBNf3V-St1T0hpsi5fSgB9Gw?e=3vXOoU" target="__blank">bgocc.zip</a>.
 <br>
 run the following commands to train background reconstruction:
 ```angular2html
