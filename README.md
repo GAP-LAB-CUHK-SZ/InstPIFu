@@ -133,12 +133,6 @@ The results will be saved into ./output/rendertaskxxx/*.ply.
 visualization results will be similar as below(testid is rendertask6452):
 <p align="center"><img src="docs/visualize.png" width="500px"/></p></br>
 
-# To Do
-- [x] Codes for background reconstruction
-- [x] Evaluation for background reconstruction
-- [x] Codes for 3D object detection
-- [ ] Visualization
-- [ ] Train and test on pix3d dataset
 # Citation
 If you find our work useful, please cite
 ```angular2
