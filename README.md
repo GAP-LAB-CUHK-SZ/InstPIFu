@@ -47,8 +47,8 @@ python preprocess_detection_data.py --data_root <pathToFrontRawData> --save_root
 ```
 FRONT3D_root is a folder extracted from 3D-FRONT.zip, which can be downloaded on the 3D FRONT official website, it contains json files that describe the scene's objects and layout.
 This script ignore to merge image and depth data, since they are already provided in <a href="https://cuhko365-my.sharepoint.com/:f:/g/personal/115010192_link_cuhk_edu_cn/Eg99g4P1VMVJoZ5fz3lmDkABvj7Gc7yCjq-qBuYNqWjl2w?e=72lix4" target="__blank">training_data</a>.
-# Code
-Visualization code will be released in a few days.
+<br>
+ps. The zip file is compressed on Windows, it should be fine to unzip it using winRAR. If you encounter error during unzip in linux, try to use 7zip to unzip the file.
 
 ## Object Reconstruction
 ### Training
