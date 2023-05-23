@@ -1,5 +1,5 @@
 resume: True
-weight: ./checkpoints/bgPIFu/model_best.pth
+weight: ./checkpoints/bgPIFu/model_best_bg.pth
 finetune: False
 method: bgPIFu
 exp_name: bgPIFu_result_1205

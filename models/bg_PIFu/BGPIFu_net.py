@@ -219,6 +219,7 @@ class BGPIFu_Net(BasePIFuNet):
         image = data_dict["image"]
         height, width = image.shape[2:4]
         K=data_dict["intrinsic"]
+        #print(image.shape,K)
         self.filter(image)
         volumn = torch.ones((marching_cube_resolution, marching_cube_resolution, marching_cube_resolution)).float().to(
             image.device)
@@ -236,6 +237,7 @@ class BGPIFu_Net(BasePIFuNet):
         visible_ind = torch.where(
             (project_x <= width-1) & (project_x > 0) & (project_y > 0) & (project_y <= height-1) & (project_sample[:, :, 2] > 0))
         # print(samples_incam.shape,visible_ind[0].shape,visible_ind[1].reshape)
+        #print(visible_ind[0].shape)
         #print(torch.max(visible_ind[0]))
         visible_sample=samples_incam[visible_ind[0],visible_ind[1],:].unsqueeze(0)
         sample_list=torch.split(visible_sample,200000,dim=1)

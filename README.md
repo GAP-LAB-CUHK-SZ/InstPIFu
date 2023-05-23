@@ -126,12 +126,25 @@ you can update the entry use_pred_pose, and pred_pose_path (path storing the obj
 ## Demo
 Visualization results can be obtained by running, make sure to run the testid which exists in ./data/3dfront/split/test:
 ```angular2html
-python demo.py --taskid rendertaskxxxx
+python demo.py --testid rendertask6452
 ```
 The results will be saved into ./output/rendertaskxxx/*.ply.
 <br>
 visualization results will be similar as below(testid is rendertask6452):
 <p align="center"><img src="docs/visualize.png" width="500px"/></p></br>
+
+### Demo on SUNRGBD dataset
+Download prepared SUNRGBD data from <a href="https://github.com/yinyunie/Total3DUnderstanding" target="__blank">total3d</a>. Put the sunrgbd_train_test_data folder under ./data/sunrgbd.
+<br>
+We train object reconstruction on Pix3D and test it on SUNRGBD. Change the weight entry in ./configs/demo_sunrgbd_instPIFu.yaml so that it points to <a href="https://cuhko365-my.sharepoint.com/:u:/g/personal/115010192_link_cuhk_edu_cn/ES4SqMFhnR9DipjSWhBt5C4BomRDF7jO-7AE1v-FaS5l6g?e=V3XTWV" target="__blank">model_best_pix3d.pth</a>.
+<br>
+run the following command, make sure the testid appears in ./data/sunrgbd/test_objects.json:
+```angular2html
+python demo_sunrgbd --testid 930
+```
+visualization results will be as below (testid is 930):
+<p align="center"><img src="docs/visualize_sunrgbd.png" width="500px"/></p></br>
+
 
 # Citation
 If you find our work useful, please cite

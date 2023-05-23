@@ -1,28 +1,28 @@
 resume: True
-weight: ./checkpoints/instPIFu_pix3d/model_best_pix3d.pth
+weight: ./checkpoints/instPIFu_pix3d/model_best_pix3d.pth #use network weight trained on pix3d
 finetune: False
 method: instPIFu
-exp_name: instPIFu_pix3d_result
+exp_name: instPIFu_result
 phase: reconstruction
-debug: True
+debug: False
 device:
   use_gpu: True
-  gpu_ids: '6'
+  gpu_ids: '2'
 data:
-  dataset: pix3d_recon
-  data_path: ./data/pix3d/train_test_data
-  split_dir: ./data/pix3d/splits_nonoverlap
-  occ_path: ./data/pix3d/occ
-  base_dir: ./data/pix3d
-  mesh_dir: ./data/pix3d/model
-  distributed: True
+  dataset: sunrgbd_recon
+  split: ./data/sunrgbd/splits/test_object.json
+  image_height: 200
+  image_width: 268
   batch_size: 1
   num_workers: 1
   use_aug: False
   use_positional_embedding: True
-  use_instance_mask: True
-  use_crop: True
   marching_cube_resolution: 256
+  multires: 4
+  use_crop: True
+  use_instance_mask: True
+  use_pred_pose: True
+  pred_pose_path: ./checkpoints/3d_box_test_new/visualization
 model:
   mlp_dim: [549, 1024, 512, 256, 128, 1]
   no_residual: False
@@ -37,12 +37,9 @@ model:
   global_recon: True
   global_mlp_dim: [293,512,256,128,1]
 other:
-  nepoch: 100
-  model_save_interval: 1
   model_save_dir: ./checkpoints
-  visualize_interval: 1000
   dump_result: True
   dump_interval: 1000
-  scale_back: True
+  scale_back: False
 
 
