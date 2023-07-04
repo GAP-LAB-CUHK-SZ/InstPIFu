@@ -134,7 +134,7 @@ visualization results will be similar as below(testid is rendertask6452):
 <p align="center"><img src="docs/visualize.png" width="500px"/></p></br>
 
 ### Demo on SUNRGBD dataset
-Download prepared SUNRGBD data from <a href="https://cuhko365-my.sharepoint.com/:u:/g/personal/115010192_link_cuhk_edu_cn/ES3sTytzWkZFtcHLHieA98YB04zKIxWjdUWc8e9fuvXtuQ?e=B2IOTs" target="__blank">sunrgbd_train_test_data.zip</a>. Put the sunrgbd_train_test_data folder under ./data/sunrgbd.
+Download prepared SUNRGBD data from <a href="https://cuhko365-my.sharepoint.com/:u:/g/personal/115010192_link_cuhk_edu_cn/ES3sTytzWkZFtcHLHieA98YBiCmbDDCjdYofIDlr7mj1QA?e=rYLJ2A" target="__blank">sunrgbd_train_test_data.zip</a>. Put the sunrgbd_train_test_data folder under ./data/sunrgbd.
 <br>
 We train object reconstruction on Pix3D and test it on SUNRGBD. Change the weight entry in ./configs/demo_sunrgbd_instPIFu.yaml so that it points to <a href="https://cuhko365-my.sharepoint.com/:u:/g/personal/115010192_link_cuhk_edu_cn/ES4SqMFhnR9DipjSWhBt5C4BomRDF7jO-7AE1v-FaS5l6g?e=V3XTWV" target="__blank">model_best_pix3d.pth</a>.
 <br>
