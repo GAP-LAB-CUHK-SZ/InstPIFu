@@ -74,14 +74,14 @@ args=parse_args()
 result_list=glob.glob(args.result_dir+"/*.ply")
 prepare_data_dir="./data/3dfront/prepare_data/test"
 gt_dir=args.gt_dir
-split_path="./data/3dfront/split/test/all.json"
+split_path="./data/3dfront/split-filter/test/all.json"
 with open(split_path,'r') as f:
     split=json.load(f)
 select_split_list=[]
 for idx,(taskid,object_id) in enumerate(split):
     if idx>2000:
         break
-    select_split_list.append((taskid,object_id))
+    select_split_list.append((taskid[0:-4],object_id))
 def get_rot_from_yaw(yaw):
     cy=np.cos(yaw)
     sy=np.sin(yaw)
@@ -99,6 +99,8 @@ log_txt=os.path.join(args.result_dir,"evaluate_log.txt")
 for (taskid,object_id) in select_split_list:
     #taskid,object_id,depth_error=item
     result_file=os.path.join(args.result_dir,"%s_%s.ply"%(taskid,object_id))
+    #print(result_file)
+    #print(os.path.isfile(result_file))
     if os.path.isfile(result_file)==False:
         continue
     #print(result_file)
@@ -135,6 +137,7 @@ for (taskid,object_id) in select_split_list:
         gt_mesh_path=os.path.join(gt_dir,jid,"normalized_watertight.obj")
         gt_mesh=trimesh.load(gt_mesh_path)
     except:
+        print(gt_mesh_path,"does not exist")
         continue
 
     '''align two mesh firstly'''
