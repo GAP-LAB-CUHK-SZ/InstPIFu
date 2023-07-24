@@ -25,7 +25,8 @@ Download prepare_data.zip, occ.zip, mask.zip, and unzip them under ./data/3dfron
 
 **Ps.** The zip file is compressed on **Windows**, it should be fine to unzip it using **winRAR**. If you encounter error during unzip in **Linux**, try to use **7zip** to unzip the file.
 ### Preprocessing Scripts
-First, install Manifold, which can be refered to <a href="https://github.com/hjwdzh/Manifold" target="__blank">Manifold</a>.
+Prepared watertight model can be downloaded via <a href="https://cuhko365-my.sharepoint.com/:u:/g/personal/115010192_link_cuhk_edu_cn/EXYaYZxfkIJLlF0EdcbBHCEBWPUlEjAAges6cltLGSZJ-w?e=i8ZSv3" target="__blank">3D-FUTURE-watertight.zip</a>.<br>
+You can choose to generate watertight model by yourself. First, install Manifold, which can be refered to <a href="https://github.com/hjwdzh/Manifold" target="__blank">Manifold</a>.
 Then, cd into data_preparation folder, run the following commands to convert 3D FUTURE CAD model into watertight model (make sure manifold_root points to the executable file):
 ```angular2html
 python prepare_watertight.py --data_root <pathTo3DFuture> --save_root <PathToSave> --manifold_root <PathToInstallManifold>
@@ -76,17 +77,17 @@ For evaluation, gaps is required to be installed for conduct ICP alignment. Run 
 cd external
 bash build_gaps.sh
 ```
-Download the <a href="https://cuhko365-my.sharepoint.com/:u:/g/personal/115010192_link_cuhk_edu_cn/Eb5ntiV22HlJmiQWNsNQycsBRovAVlTpbiFEV5yeITdYGQ?e=QbzaTG" target="__blank">ground truth mesh in test set </a>, and unzip it.
+Download the <a href="https://cuhko365-my.sharepoint.com/:u:/g/personal/115010192_link_cuhk_edu_cn/EXYaYZxfkIJLlF0EdcbBHCEBWPUlEjAAges6cltLGSZJ-w?e=i8ZSv3" target="__blank">all ground truth mesh</a>, and unzip it.
 run the following commands for evaluation:
 ```angular2html
 python evaluate_object_reconstruction.py --result_dir ./checkpoints/<exp_name> --gt_dir ./Path/to/gt/watertight/mesh
 ```
-evaluation is only conducted on 2000 samples inside ./data/3dfront/split/test.json
+evaluation is only conducted on 2000 samples inside ./data/3dfront/split-filter/test.json
 evaluation results on 3D-FUTURE:
 
-| Category         | cabinet | chair | table | sofa | bed  | night_stand | Total |
-|:-----------------|:--------|:------|:------|:-----|:-----|:------------|:------|
-| Chamfer Distance | 4.25    | 9.93  | 15.00 | 6.42 | 9.92 | 17.08       | 10.61 |
+| Category         | cabinet | chair | table | sofa | bed  | night_stand | dresser | desk  | bookshelf | Total |
+|:-----------------|:--------|:------|:------|:-----|:-----|:------------|:--------|:------|:----------|:------|
+| Chamfer Distance | 5.53    | 10.33 | 17.07 | 5.76 | 7.80 | 18.29       | 40.03   | 52.31 | 3.66      | 10.92 |
 
 ## Background reconstruction
 ### training
