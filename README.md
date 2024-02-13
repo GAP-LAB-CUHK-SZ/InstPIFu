@@ -101,7 +101,7 @@ run the following commands to extract background mesh:
 ```angular2html
 python main.py --mode test --config ./configs/test_bg_PIFu.yaml
 ```
-you can also try to use the pretrained weight at <a href="https://cuhko365-my.sharepoint.com/:u:/g/personal/115010192_link_cuhk_edu_cn/EUCaLPeAr_9HhX05X6VMB30BEiK-mp4GKl1tmTJMOQL1ng?e=1CkqRW" target="__blank">model_best_bg.pth</a>.
+you can also try to use the pretrained weight at <a href="https://cuhko365-my.sharepoint.com/:u:/g/personal/115010192_link_cuhk_edu_cn/EXVsWL8oEzRCq6x_r45WPkgBdG3_SlbWmCaB8yYAs8Ig-w?e=j82csS" target="__blank">model_best_bg.pth</a>.
 And modify the weight entry in the configuration file as your weight path <br>
 background ground truth depth map is inside <a href="https://cuhko365-my.sharepoint.com/:f:/g/personal/115010192_link_cuhk_edu_cn/Eg99g4P1VMVJoZ5fz3lmDkABvj7Gc7yCjq-qBuYNqWjl2w?e=72lix4" target="__blank">training_data</a> 
 as bgdepth.zip, unzip this file and put it under ./data/3dfront
