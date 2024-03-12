@@ -286,6 +286,8 @@ class Front3D_Recon_Dataset(Dataset):
                 project_center = bboxes['project_center']
                 centroid_depth = bboxes['centroid_depth']
                 obj_cam_center = get_centroid_from_proj(centroid_depth, project_center, org_K)
+            else:
+                pitch=layout['pitch']
 
             inv_rot = np.linalg.inv(rot_matrix)
             canonical_samples = input_samples[:, 0:3].copy()
@@ -369,7 +371,7 @@ class Front3D_Recon_Dataset(Dataset):
                          "sequence_id": sequence["sequence_id"], "z_feat": z_feat, "K": K, "rot_matrix": rot_matrix,
                          "jid": jid, "bdb_grid": bdb_grid, "taskid": taskid, "obj_id": str(object_ind),
                          "obj_cam_center": obj_cam_center, "cls_codes": cls_codes.astype(np.float32),
-                         "img_coor": bdb_coor.astype(np.float32), "bbox_size": bbox_size}
+                         "img_coor": bdb_coor.astype(np.float32), "bbox_size": bbox_size,"pitch":pitch}
             if self.config['data']['use_instance_mask']:
                 data_dict["mask"] = crop_mask
             success_flag = True
