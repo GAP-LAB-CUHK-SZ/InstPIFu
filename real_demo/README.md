@@ -28,4 +28,6 @@ bash run_demo.sh
 ```
 Results will be saved at InstPIFu/real_demo/taskid
 
+#### background reconstruction for this demo will be added soon within these several days.
+
 
