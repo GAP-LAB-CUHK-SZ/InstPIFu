@@ -1,12 +1,12 @@
 import argparse,os
 parser = argparse.ArgumentParser(description="im3d arg parser")
 parser.add_argument('--mode', type=str, default='demo', help='train, test, demo or qtrain, qtest')
-parser.add_argument("--instpifu_dir",type=str,default="/apdcephfs/private_haolinliu/InstPIFu")
-parser.add_argument("--im3d_dir",type=str,default="/apdcephfs/private_haolinliu/Implicit3DUnderstanding")
+parser.add_argument("--instpifu_dir",type=str,required=True)
+parser.add_argument("--im3d_dir",type=str,required=True)
 parser.add_argument("--taskid",type=str,default="2003",help="image id from sunrgbd dataset")
 args=parser.parse_args()
 parser.add_argument('--config', type=str, default=os.path.join(args.instpifu_dir,"checkpoints/im3d_weight/out_config.yaml"),
-                    help='configure file for training or testing.')
+                    help='configure file for training or testing.') #add new argument for the config files
 args=parser.parse_args()
 import sys
 sys.path[0]=args.im3d_dir

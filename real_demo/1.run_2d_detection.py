@@ -1,9 +1,9 @@
 import argparse
 parser=argparse.ArgumentParser()
-parser.add_argument("--yolo_dir",type=str,default="/apdcephfs/private_haolinliu/yolov7")
-parser.add_argument("--instpifu_dir",type=str,default="/apdcephfs/private_haolinliu/InstPIFu")
+parser.add_argument("--yolo_dir",type=str,required=True)
+parser.add_argument("--instpifu_dir",type=str,required=True)
 parser.add_argument("--taskid",type=str,default="2003",help="image id from sunrgbd dataset")
-parser.add_argument("--sunrgbd_dir",type=str,default="/apdcephfs_cq3/share_1330077/haolinliu/data/sunrgbd_train_test_data")
+parser.add_argument("--sunrgbd_dir",type=str,required=True)
 args=parser.parse_args()
 
 import os,sys

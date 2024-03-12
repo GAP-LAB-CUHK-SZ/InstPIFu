@@ -1,7 +1,7 @@
 import argparse
 
 parser=argparse.ArgumentParser()
-parser.add_argument("--instpifu_dir",type=str,default="/apdcephfs/private_haolinliu/InstPIFu")
+parser.add_argument("--instpifu_dir",type=str,required=True)
 parser.add_argument("--taskid",type=str,default="2003")
 args= parser.parse_args()
 import os,sys
