@@ -38,15 +38,16 @@ python sample_points.py --data_root <pathTo3DFutureWatertight> --target_root <Pa
 Make sure to install trimesh with embree to accelerate the computation. <br>
 Then, download <a href="https://cuhko365-my.sharepoint.com/:u:/g/personal/115010192_link_cuhk_edu_cn/EVmihvDBfmVBgR-bHWpDZIsBco3-0cYFRdEQLJlbJBLnGg?e=bUmbbX" target="__blank">3d-front-layout.zip</a>.
 This folder will be used in the later script as layout_root. You can choose to generate your own layout for 3D-FRONT, but you will need to extract the depth image from the prepare_data.zip in the OneDrive Shared Folder, 
-the desc.json will be provided in <a href="https://cuhko365-my.sharepoint.com/:u:/g/personal/115010192_link_cuhk_edu_cn/EVmihvDBfmVBgR-bHWpDZIsBco3-0cYFRdEQLJlbJBLnGg?e=Z1DaYx" target="__blank">3d-front-object.zip</a>.
+the desc.json will be provided in the raw rendering data <a href="https://cuhko365-my.sharepoint.com/:u:/g/personal/115010192_link_cuhk_edu_cn/EZn18gLnH31NoW7JXsA0zDIBBVESspEVmJLfhW3TVyRLHw?e=a3Qj87" target="__blank">3d-front-raw.zip</a>.
+The extracted data should be used as **data_root** in the following script.
 ```angular2html
 python preprocess_layout.py --data_root <pathToFrontRawData> --save_root <PathToSave>
 ```
-And download <a href="https://cuhko365-my.sharepoint.com/:u:/g/personal/115010192_link_cuhk_edu_cn/EVmihvDBfmVBgR-bHWpDZIsBco3-0cYFRdEQLJlbJBLnGg?e=Z1DaYx" target="__blank">3d-front-object.zip</a>.
-This folder will be used in the later script as data_root.
+And download <a href="https://cuhko365-my.sharepoint.com/:u:/g/personal/115010192_link_cuhk_edu_cn/EZn18gLnH31NoW7JXsA0zDIBBVESspEVmJLfhW3TVyRLHw?e=a3Qj87" target="__blank">3d-front-raw.zip</a>.
+This folder will be used in the later script as **data_root**.
 Run the following commands to preprocess detection data by:
 ```angular2html
-python preprocess_detection_data.py --data_root <pathToFrontRawData> --save_root <pathToSave> --FRONT3D_root <pathTo3DFrontDataset> --layout_root <pathToFront3DLayout>
+python prepare_detection_data.py --data_root <pathToFrontRawData> --save_root <pathToSave> --FRONT3D_root <pathTo3DFrontDataset> --layout_root <pathToFront3DLayout>
 ```
 FRONT3D_root is a folder extracted from 3D-FRONT.zip, which can be downloaded on the 3D FRONT official website, it contains json files that describe the scene's objects and layout.
 This script ignore to merge image and depth data, since they are already provided in <a href="https://cuhko365-my.sharepoint.com/:f:/g/personal/115010192_link_cuhk_edu_cn/Eg99g4P1VMVJoZ5fz3lmDkABvj7Gc7yCjq-qBuYNqWjl2w?e=72lix4" target="__blank">training_data</a>.
